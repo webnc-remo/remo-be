@@ -5,7 +5,7 @@ import {
   StringFieldOptional,
 } from '../../../../../decorators';
 
-export class UserRequest {
+export class UserRequestDto {
   @ApiProperty({
     example: 'tantran.300803@gmail.com',
     description: 'User email',

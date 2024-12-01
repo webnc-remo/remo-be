@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { UserRequest } from '../domains/dtos/requests/user.dto';
+import { UserRequestDto } from '../domains/dtos/requests/user.dto';
 import { UserEntity } from '../domains/entities/user.entity';
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<UserEntity | null>;
-  createUser(user: UserRequest): Promise<UserEntity | null>;
+  createUser(user: UserRequestDto): Promise<UserEntity | null>;
 }
 
 @Injectable()
@@ -21,7 +21,7 @@ export class UserRepository implements IUserRepository {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async createUser(user: UserRequest): Promise<UserEntity> {
+  async createUser(user: UserRequestDto): Promise<UserEntity> {
     return this.userRepository.save({ ...user, createdAt: new Date() });
   }
 

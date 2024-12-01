@@ -6,10 +6,18 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
-import { PublicRoute } from '../../../decorators';
+import { AuthUser, PublicRoute } from '../../../decorators';
+import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
+import { RefreshTokenRequestDto } from '../domains/dtos/requests/refresh-token.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
 import { IAuthService } from '../services/auth.service';
 
@@ -55,5 +63,26 @@ export class AuthController {
     const user = await this.authService.handleLogin(loginRequestDto);
 
     return user;
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'Logout' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Logout successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Logout failed',
+  })
+  @ApiBearerAuth()
+  async logout(
+    @AuthUser() user: UserInfoDto,
+    @Body() token: RefreshTokenRequestDto,
+  ) {
+    const removedToken = await this.authService.handleLogout(user, token);
+
+    return removedToken;
   }
 }
