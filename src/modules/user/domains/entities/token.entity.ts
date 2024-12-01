@@ -12,6 +12,9 @@ export class TokenEntity {
   @Column({ type: 'varchar' })
   token!: string;
 
+  @Column({ type: 'varchar' })
+  refreshToken!: string;
+
   @Column({ type: 'timestamp' })
   @Transform(({ value }: { value: Date }) => value.getTime() / 1000, {
     toPlainOnly: true,

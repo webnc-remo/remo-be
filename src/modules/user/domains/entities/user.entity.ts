@@ -11,6 +11,12 @@ export class UserEntity {
   @Column({ nullable: true, type: 'varchar' })
   password!: string | null;
 
+  @Column({ type: 'varchar' })
+  socialProvider!: string;
+
+  @Column({ type: 'varchar' })
+  socialProviderd!: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
 }
