@@ -1,3 +1,4 @@
+/* eslint-disable simple-import-sort/imports */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   Body,
@@ -16,11 +17,8 @@ import { Response } from 'express';
 
 import { PublicRoute } from '../../../decorators';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
-import { TokenBody } from '../domains/dtos/requests/token.dto';
 import { UserRequest } from '../domains/dtos/requests/user.dto';
-import { LogOutResponse } from '../domains/dtos/responses/logout.dto';
 import { ProfileResponse } from '../domains/dtos/responses/profile.dto';
-import { TokenEntity } from '../domains/entities/token.entity';
 import { IUserService } from '../services/user.service';
 
 @Controller('/user')
@@ -48,57 +46,6 @@ export class UserController {
       const tokenPayload = await this.userService.handleLogin(user);
 
       return res.status(HttpStatus.CREATED).json(tokenPayload);
-    } catch (error) {
-      return res.status(HttpStatus.NOT_FOUND).json(error);
-    }
-  }
-
-  @Post('/register')
-  @ApiOperation({ summary: 'Register' })
-  @HttpCode(HttpStatus.CREATED)
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Register success',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Register failed',
-  })
-  @PublicRoute(true)
-  async register(@Body() userRequest: UserRequest, @Res() res: Response) {
-    try {
-      const user = await this.userService.handleRegister(userRequest);
-
-      return res.status(HttpStatus.CREATED).json(user);
-    } catch (error) {
-      return res.status(HttpStatus.NOT_FOUND).json(error);
-    }
-  }
-
-  @Post('/logout')
-  @ApiOperation({ summary: 'Logout' })
-  @HttpCode(HttpStatus.CREATED)
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Logout success',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Logout failed',
-  })
-  @PublicRoute(true)
-  async logout(@Body() token: TokenBody, @Res() res: Response) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const removedToken: TokenEntity =
-        await this.userService.handleLogout(token);
-
-      const logOutResponse: LogOutResponse = {
-        message: 'Logged out',
-        userId: removedToken.userId,
-      };
-
-      return res.status(HttpStatus.CREATED).json(logOutResponse);
     } catch (error) {
       return res.status(HttpStatus.NOT_FOUND).json(error);
     }

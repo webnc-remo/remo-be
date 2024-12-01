@@ -4,15 +4,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { RefreshTokenEntity } from '../auth/domains/entities/token.entity';
-import { UserController } from './controllers/user.controller';
-import { UserEntity } from './domains/entities/user.entity';
-import { UserRepository } from './repository/user.repository';
-import { UserService } from './services/user.service';
+import { UserEntity } from '../user/domains/entities/user.entity';
+import { UserRepository } from '../user/repository/user.repository';
+import { UserService } from '../user/services/user.service';
+import { UserModule } from '../user/user.module';
+import { AuthController } from './controllers/auth.controller';
+import { AuthRepository } from './repository/auth.repository';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
     TypeOrmModule.forFeature([RefreshTokenEntity]),
+    TypeOrmModule.forFeature([UserEntity]),
+    UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
@@ -24,18 +28,27 @@ import { UserService } from './services/user.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UserController],
-  exports: [UserService, 'IUserService'],
+  controllers: [AuthController],
+  exports: [AuthService, 'IAuthService', UserService, 'IUserService'],
   providers: [
+    AuthService,
+    {
+      provide: 'IAuthService',
+      useClass: AuthService,
+    },
+    {
+      provide: 'IAuthRepository',
+      useClass: AuthRepository,
+    },
+    UserService,
     {
       provide: 'IUserService',
       useClass: UserService,
     },
-    UserService,
     {
       provide: 'IUserRepository',
       useClass: UserRepository,
     },
   ],
 })
-export class UserModule {}
+export class AuthModule {}

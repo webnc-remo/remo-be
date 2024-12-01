@@ -9,19 +9,18 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { generateHash, handleError, validateHash } from '../../../common/utils';
-import { TokenBody } from '../domains/dtos/requests/token.dto';
+import { handleError, validateHash } from '../../../common/utils';
+import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
 import { UserRequest } from '../domains/dtos/requests/user.dto';
 import { ProfileResponse } from '../domains/dtos/responses/profile.dto';
 import { TokenPayload } from '../domains/dtos/responses/token.dto';
-import { UserResponse } from '../domains/dtos/responses/user-response.dto';
-import { TokenEntity } from '../domains/entities/token.entity';
+import { UserResponseDto } from '../domains/dtos/responses/user-response.dto';
 import { UserRepository } from '../repository/user.repository';
 
 export interface IUserService {
+  getUserByEmail(email: string): Promise<UserResponseDto | null>;
+  createUser(registerRequest: RegisterRequestDto): Promise<UserResponseDto>;
   handleLogin(user: UserRequest): Promise<TokenPayload>;
-  handleRegister(user: UserRequest): Promise<UserResponse>;
-  handleLogout(token: TokenBody): Promise<TokenEntity>;
   getUserProfile(userId: string): Promise<ProfileResponse>;
 }
 
@@ -36,6 +35,28 @@ export class UserService implements IUserService {
     private readonly jwtService: JwtService,
   ) {
     this.logger = new Logger(UserService.name);
+  }
+
+  async getUserByEmail(email: string): Promise<UserResponseDto | null> {
+    try {
+      const user = await this.userRepository.findUserByEmail(email);
+
+      return user;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async createUser(
+    registerRequest: RegisterRequestDto,
+  ): Promise<UserResponseDto> {
+    try {
+      const user = await this.userRepository.createUser(registerRequest);
+
+      return user;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
   }
 
   public async handleLogin(userRequest: UserRequest) {
@@ -73,51 +94,6 @@ export class UserService implements IUserService {
       return tokenPayload;
     } catch (error) {
       throw handleError(this.logger, error);
-    }
-  }
-
-  async handleLogout(token: TokenBody): Promise<TokenEntity> {
-    try {
-      const removeToken = await this.userRepository.removeToken(token.token);
-
-      return removeToken;
-    } catch (error) {
-      this.logger.error(error);
-
-      throw error;
-    }
-  }
-
-  async handleRegister(userRequest: UserRequest): Promise<UserResponse> {
-    try {
-      if (!userRequest.email) {
-        throw new BadRequestException('Email is required');
-      }
-
-      const existedUser = await this.userRepository.findUserByEmail(
-        userRequest.email,
-      );
-
-      if (existedUser) {
-        throw new BadRequestException('Email is already existed');
-      }
-
-      if (!userRequest.password) {
-        throw new BadRequestException('Password is required');
-      }
-
-      const hashedPassword = generateHash(userRequest.password);
-
-      const user = await this.userRepository.createUser({
-        ...userRequest,
-        password: hashedPassword,
-      });
-
-      return user;
-    } catch (error) {
-      this.logger.error(error);
-
-      throw error;
     }
   }
 

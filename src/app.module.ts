@@ -6,6 +6,7 @@ import { ClsModule } from 'nestjs-cls';
 import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 
+import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
@@ -13,6 +14,7 @@ import { SharedModule } from './shared/shared.module';
 @Module({
   imports: [
     UserModule,
+    AuthModule,
     ClsModule.forRoot({
       global: true,
       middleware: {
