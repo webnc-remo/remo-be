@@ -9,6 +9,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { PublicRoute } from '../../../decorators';
+import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
 import { IAuthService } from '../services/auth.service';
 
@@ -50,9 +51,9 @@ export class AuthController {
     description: 'Login failed',
   })
   @PublicRoute(true)
-  login() {
-    // const tokenPayload = await this.userService.handleLogin(user);
-    // return res.status(HttpStatus.OK).json(tokenPayload);
-    return 'hello';
+  async login(@Body() loginRequestDto: LoginRequestDto) {
+    const user = await this.authService.handleLogin(loginRequestDto);
+
+    return user;
   }
 }

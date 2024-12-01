@@ -9,10 +9,11 @@ import { handleError } from '../../../common/utils';
 import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
 import { ProfileResponse } from '../domains/dtos/responses/profile.dto';
 import { UserResponseDto } from '../domains/dtos/responses/user-response.dto';
+import { UserEntity } from '../domains/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
 
 export interface IUserService {
-  getUserByEmail(email: string): Promise<UserResponseDto | null>;
+  getUserByEmail(email: string): Promise<UserEntity | null>;
   createUser(registerRequest: RegisterRequestDto): Promise<UserResponseDto>;
   getUserProfile(userId: string): Promise<ProfileResponse>;
 }
@@ -28,7 +29,7 @@ export class UserService implements IUserService {
     this.logger = new Logger(UserService.name);
   }
 
-  async getUserByEmail(email: string): Promise<UserResponseDto | null> {
+  async getUserByEmail(email: string): Promise<UserEntity | null> {
     try {
       const user = await this.userRepository.findUserByEmail(email);
 

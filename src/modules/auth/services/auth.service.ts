@@ -3,19 +3,27 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { generateHash, handleError } from '../../../common/utils';
+import { generateHash, handleError, validateHash } from '../../../common/utils';
 import { IUserService } from '../../user/services/user.service';
+import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
 import { DecodedToken } from '../domains/dtos/responses/decoded-token.dto';
+import { LoginResponseDto } from '../domains/dtos/responses/login.dto';
 import { RegisterResponseDto } from '../domains/dtos/responses/register.dto';
 import { AuthRepository } from '../repository/auth.repository';
 
 export interface IAuthService {
-  handleRegister(user: RegisterRequestDto): Promise<RegisterResponseDto | null>;
+  handleRegister(
+    registerRequestDto: RegisterRequestDto,
+  ): Promise<RegisterResponseDto | null>;
+  handleLogin(
+    loginResponseDto: LoginRequestDto,
+  ): Promise<LoginResponseDto | null>;
 }
 
 @Injectable()
@@ -100,41 +108,45 @@ export class AuthService implements IAuthService {
     }
   }
 
-  // public async handleLogin(userRequest: UserRequest) {
-  //   try {
-  //     if (!userRequest.email) {
-  //       throw new BadRequestException('Email is required');
-  //     }
+  public async handleLogin(
+    loginRequestDto: LoginRequestDto,
+  ): Promise<LoginResponseDto | null> {
+    try {
+      if (!loginRequestDto.email) {
+        throw new BadRequestException('Email is required');
+      }
 
-  //     const user = await this.userRepository.findUserByEmail(userRequest.email);
+      if (!loginRequestDto.password) {
+        throw new BadRequestException('Password is required');
+      }
 
-  //     if (!user) {
-  //       throw new NotFoundException('User is not found');
-  //     }
+      const user = await this.userService.getUserByEmail(loginRequestDto.email);
 
-  //     const isCorrectPassword = validateHash(
-  //       userRequest.password!,
-  //       user.password,
-  //     );
+      if (!user) {
+        throw new NotFoundException(
+          `User with email ${loginRequestDto.email} not found`,
+        );
+      }
 
-  //     if (!isCorrectPassword) {
-  //       throw new BadRequestException('Password is incorrect');
-  //     }
+      const isCorrectPassword = validateHash(
+        loginRequestDto.password,
+        user.password,
+      );
 
-  //     const tokenPayload: TokenPayload = {
-  //       accessToken: this.jwtService.sign({
-  //         email: userRequest.email,
-  //         id: user.id,
-  //       }),
-  //       user: {
-  //         id: user.id,
-  //         email: userRequest.email,
-  //       },
-  //     };
+      if (!isCorrectPassword) {
+        throw new BadRequestException('Password is incorrect');
+      }
 
-  //     return tokenPayload;
-  //   } catch (error) {
-  //     throw handleError(this.logger, error);
-  //   }
-  // }
+      const refreshToken = await this.signRefreshToken(user.id);
+      const accessToken = this.jwtService.sign({ userId: user.id });
+
+      return {
+        accessToken,
+        refreshToken,
+        user,
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
 }
