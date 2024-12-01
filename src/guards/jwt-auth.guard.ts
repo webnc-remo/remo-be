@@ -1,60 +1,53 @@
 import {
-  CanActivate,
   ExecutionContext,
   Injectable,
-  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
+import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 
+import { PUBLIC_ROUTE_KEY } from '../decorators/index';
+
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
-  private readonly logger = new Logger(JwtAuthGuard.name);
-
-  constructor(private readonly jwtService: JwtService) {}
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const request = context.switchToHttp().getRequest();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const token = this.extractTokenFromHeader(request);
-
-      if (!token) {
-        throw new UnauthorizedException('No token provided');
-      }
-
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const payload = await this.jwtService.verifyAsync(token);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        request.user = payload;
-
-        return true;
-      } catch (jwtError: unknown) {
-        this.logger.error(
-          `JWT verification failed: ${(jwtError as Error).message}`,
-        );
-
-        throw new UnauthorizedException('Invalid token');
-      }
-    } catch (error: unknown) {
-      this.logger.error(`Authentication failed: ${(error as Error).message}`);
-
-      throw error;
-    }
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private readonly reflector: Reflector) {
+    super();
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    try {
-      const [type, token] = request.headers.authorization?.split(' ') ?? [];
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(
+      PUBLIC_ROUTE_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
-      return type === 'Bearer' ? token : undefined;
-    } catch (error: unknown) {
-      this.logger.error(`Token extraction failed: ${(error as Error).message}`);
+    const request = context.switchToHttp().getRequest<Request>();
 
-      throw error;
+    if (isPublic) {
+      const authHeader = request.headers.authorization;
+
+      if (authHeader?.startsWith('Bearer ')) {
+        return super.canActivate(context);
+      }
+
+      return true;
     }
+
+    return super.canActivate(context);
+  }
+
+  handleRequest<UserInfoDto>(
+    err,
+    user,
+    _info,
+    _context: ExecutionContext,
+  ): UserInfoDto {
+    if (err || !user) {
+      throw err || new UnauthorizedException('Access Token is Invalid');
+    }
+
+    const responseUser: UserInfoDto = user as UserInfoDto;
+
+    return responseUser;
   }
 }
