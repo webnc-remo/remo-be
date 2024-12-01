@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { generateHash, handleError, validateHash } from '../../../common/utils';
+import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { IUserService } from '../../user/services/user.service';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
@@ -69,8 +70,9 @@ export class AuthService implements IAuthService {
         password: hashedPassword,
       });
 
-      const refreshToken = await this.signRefreshToken(user.id);
-      const accessToken = this.jwtService.sign({ userId: user.id });
+      const userInfo: UserInfoDto = { id: user.id, email: user.email };
+      const refreshToken = await this.signRefreshToken(userInfo);
+      const accessToken = this.jwtService.sign(userInfo);
 
       return {
         accessToken,
@@ -82,22 +84,19 @@ export class AuthService implements IAuthService {
     }
   }
 
-  private async signRefreshToken(userId: string) {
+  private async signRefreshToken(userInfo: UserInfoDto): Promise<string> {
     try {
-      const refreshToken: string = this.jwtService.sign(
-        { userId },
-        {
-          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-          expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRED'),
-        },
-      );
+      const refreshToken: string = this.jwtService.sign(userInfo, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRED'),
+      });
 
       const decodedToken: DecodedToken = this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
 
       await this.authRepository.saveRefreshToken(
-        userId,
+        userInfo.id,
         refreshToken,
         decodedToken,
       );
@@ -137,8 +136,9 @@ export class AuthService implements IAuthService {
         throw new BadRequestException('Password is incorrect');
       }
 
-      const refreshToken = await this.signRefreshToken(user.id);
-      const accessToken = this.jwtService.sign({ userId: user.id });
+      const userInfo: UserInfoDto = { id: user.id, email: user.email };
+      const refreshToken = await this.signRefreshToken(userInfo);
+      const accessToken = this.jwtService.sign(userInfo);
 
       return {
         accessToken,

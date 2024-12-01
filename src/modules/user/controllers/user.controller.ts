@@ -7,7 +7,12 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { ProfileResponse } from '../domains/dtos/responses/profile.dto';
@@ -33,6 +38,7 @@ export class UserController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
+  @ApiBearerAuth()
   async getProfile(@Param('id') userId: string) {
     const user: ProfileResponse = await this.userService.getUserProfile(userId);
 

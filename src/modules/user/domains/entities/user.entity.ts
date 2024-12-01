@@ -18,7 +18,7 @@ export class UserEntity {
   socialProvider!: string | null;
 
   @Column({ type: 'varchar', nullable: true })
-  socialProviderd!: string | null;
+  socialProviderId!: string | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;

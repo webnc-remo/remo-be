@@ -19,9 +19,6 @@ export class LoginResponseDto {
   @IsString()
   refreshToken!: string;
 
-  @ApiProperty({
-    description: 'User',
-  })
   @Type(() => UserResponseDto)
   user!: UserResponseDto;
 }
