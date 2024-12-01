@@ -99,4 +99,42 @@ export class AuthService implements IAuthService {
       throw handleError(this.logger, error);
     }
   }
+
+  // public async handleLogin(userRequest: UserRequest) {
+  //   try {
+  //     if (!userRequest.email) {
+  //       throw new BadRequestException('Email is required');
+  //     }
+
+  //     const user = await this.userRepository.findUserByEmail(userRequest.email);
+
+  //     if (!user) {
+  //       throw new NotFoundException('User is not found');
+  //     }
+
+  //     const isCorrectPassword = validateHash(
+  //       userRequest.password!,
+  //       user.password,
+  //     );
+
+  //     if (!isCorrectPassword) {
+  //       throw new BadRequestException('Password is incorrect');
+  //     }
+
+  //     const tokenPayload: TokenPayload = {
+  //       accessToken: this.jwtService.sign({
+  //         email: userRequest.email,
+  //         id: user.id,
+  //       }),
+  //       user: {
+  //         id: user.id,
+  //         email: userRequest.email,
+  //       },
+  //     };
+
+  //     return tokenPayload;
+  //   } catch (error) {
+  //     throw handleError(this.logger, error);
+  //   }
+  // }
 }

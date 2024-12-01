@@ -37,4 +37,22 @@ export class AuthController {
 
     return user;
   }
+
+  @Post('/login')
+  @ApiOperation({ summary: 'Login' })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Login success',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Login failed',
+  })
+  @PublicRoute(true)
+  login() {
+    // const tokenPayload = await this.userService.handleLogin(user);
+    // return res.status(HttpStatus.OK).json(tokenPayload);
+    return 'hello';
+  }
 }
