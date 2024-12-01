@@ -1,8 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class DecodedToken {
+export class DecodedTokenDto {
   @ApiProperty()
   id!: string;
+
+  @ApiProperty()
+  email!: string;
 
   @ApiProperty()
   iat!: number;
