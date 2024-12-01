@@ -11,6 +11,7 @@ import { UserModule } from '../user/user.module';
 import { AuthController } from './controllers/auth.controller';
 import { AuthRepository } from './repository/auth.repository';
 import { AuthService } from './services/auth.service';
+import { JwtStrategy } from './services/strategies/jwt.strategy';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthService } from './services/auth.service';
   exports: [AuthService, 'IAuthService', UserService, 'IUserService'],
   providers: [
     AuthService,
+    JwtStrategy,
     {
       provide: 'IAuthService',
       useClass: AuthService,

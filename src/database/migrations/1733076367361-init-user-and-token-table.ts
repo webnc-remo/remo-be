@@ -11,7 +11,7 @@ export class InitUserAndTokenTable1733076367361 implements MigrationInterface {
                 "avatar" character varying,
                 "password" character varying,
                 "social_provider" character varying,
-                "social_providerd" character varying,
+                "social_provider_id" character varying,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT "UQ_97672ac88f789774dd47f7c8be3" UNIQUE ("email"),
                 CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id")

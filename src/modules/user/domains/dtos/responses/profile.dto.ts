@@ -8,5 +8,8 @@ export class ProfileResponse {
   email!: string;
 
   @ApiProperty()
+  avatar!: string;
+
+  @ApiProperty()
   createdAt!: Date;
 }
