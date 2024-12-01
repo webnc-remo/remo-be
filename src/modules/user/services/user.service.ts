@@ -7,7 +7,7 @@ import {
 
 import { handleError } from '../../../common/utils';
 import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
-import { ProfileResponse } from '../domains/dtos/responses/profile.dto';
+import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
 import { UserResponseDto } from '../domains/dtos/responses/user-response.dto';
 import { UserEntity } from '../domains/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
@@ -15,7 +15,7 @@ import { UserRepository } from '../repository/user.repository';
 export interface IUserService {
   getUserByEmail(email: string): Promise<UserEntity | null>;
   createUser(registerRequest: RegisterRequestDto): Promise<UserResponseDto>;
-  getUserProfile(userId: string): Promise<ProfileResponse>;
+  getUserProfile(userId: string): Promise<ProfileResponseDto>;
 }
 
 @Injectable()
@@ -51,7 +51,7 @@ export class UserService implements IUserService {
     }
   }
 
-  async getUserProfile(userId: string): Promise<ProfileResponse> {
+  async getUserProfile(userId: string): Promise<ProfileResponseDto> {
     try {
       const user = await this.userRepository.findUserById(userId);
 
@@ -59,7 +59,7 @@ export class UserService implements IUserService {
         throw new UnauthorizedException('User not found');
       }
 
-      const profileResponse: ProfileResponse = {
+      const profileResponse: ProfileResponseDto = {
         id: user.id,
         email: user.email ?? '',
         avatar: user.avatar ?? '',

@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { DecodedToken } from '../domains/dtos/responses/decoded-token.dto';
+import { DecodedTokenDto } from '../domains/dtos/responses/decoded-token.dto';
 import { RefreshTokenEntity } from '../domains/entities/token.entity';
 
 export interface IAuthRepository {
   saveRefreshToken(
     userId: string,
     refreshToken: string,
-    decodedToken: DecodedToken,
+    decodedToken: DecodedTokenDto,
   ): Promise<RefreshTokenEntity | null>;
+  removeRefreshToken(
+    userId: string,
+    token: string,
+  ): Promise<RefreshTokenEntity>;
 }
 
 @Injectable()
@@ -23,7 +27,7 @@ export class AuthRepository implements IAuthRepository {
   async saveRefreshToken(
     userId: string,
     refreshToken: string,
-    decodedToken: DecodedToken,
+    decodedToken: DecodedTokenDto,
   ): Promise<RefreshTokenEntity | null> {
     return this.tokenRepository.save({
       userId,
@@ -31,5 +35,25 @@ export class AuthRepository implements IAuthRepository {
       iat: new Date(decodedToken.iat * 1000),
       exp: new Date(decodedToken.exp * 1000),
     });
+  }
+
+  async removeRefreshToken(
+    userId: string,
+    token: string,
+  ): Promise<RefreshTokenEntity> {
+    const removedToken = await this.tokenRepository.findOne({
+      where: {
+        userId,
+        token,
+      },
+    });
+
+    if (!removedToken) {
+      throw new NotFoundException(`User ${userId} already logged out`);
+    }
+
+    const result = await this.tokenRepository.remove(removedToken);
+
+    return result;
   }
 }

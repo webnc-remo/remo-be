@@ -12,9 +12,11 @@ import { generateHash, handleError, validateHash } from '../../../common/utils';
 import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { IUserService } from '../../user/services/user.service';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
+import { RefreshTokenRequestDto } from '../domains/dtos/requests/refresh-token.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
-import { DecodedToken } from '../domains/dtos/responses/decoded-token.dto';
+import { DecodedTokenDto } from '../domains/dtos/responses/decoded-token.dto';
 import { LoginResponseDto } from '../domains/dtos/responses/login.dto';
+import { LogoutResponseDto } from '../domains/dtos/responses/logout.dto';
 import { RegisterResponseDto } from '../domains/dtos/responses/register.dto';
 import { AuthRepository } from '../repository/auth.repository';
 
@@ -25,6 +27,10 @@ export interface IAuthService {
   handleLogin(
     loginResponseDto: LoginRequestDto,
   ): Promise<LoginResponseDto | null>;
+  handleLogout(
+    user: UserInfoDto,
+    refreshToken: RefreshTokenRequestDto,
+  ): Promise<LogoutResponseDto | null>;
 }
 
 @Injectable()
@@ -91,9 +97,12 @@ export class AuthService implements IAuthService {
         expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRED'),
       });
 
-      const decodedToken: DecodedToken = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      });
+      const decodedToken: DecodedTokenDto = this.jwtService.verify(
+        refreshToken,
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        },
+      );
 
       await this.authRepository.saveRefreshToken(
         userInfo.id,
@@ -144,6 +153,25 @@ export class AuthService implements IAuthService {
         accessToken,
         refreshToken,
         user,
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  public async handleLogout(
+    user: UserInfoDto,
+    refreshToken: RefreshTokenRequestDto,
+  ): Promise<LogoutResponseDto | null> {
+    try {
+      const removedToken = await this.authRepository.removeRefreshToken(
+        user.id,
+        refreshToken.refreshToken,
+      );
+
+      return {
+        message: 'Logged out',
+        userId: removedToken.userId,
       };
     } catch (error) {
       throw handleError(this.logger, error);
