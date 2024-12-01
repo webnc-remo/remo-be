@@ -1,19 +1,19 @@
 import { Transform } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'token' })
-export class TokenEntity {
+import { UserEntity } from '../../../user/domains/entities/user.entity';
+
+@Entity({ name: 'refresh_tokens' })
+export class RefreshTokenEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'uuid' })
+  @ManyToOne(() => UserEntity, (user) => user.id)
   userId!: string;
 
   @Column({ type: 'varchar' })
   token!: string;
-
-  @Column({ type: 'varchar' })
-  refreshToken!: string;
 
   @Column({ type: 'timestamp' })
   @Transform(({ value }: { value: Date }) => value.getTime() / 1000, {

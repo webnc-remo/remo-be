@@ -1,7 +1,7 @@
-import { type UserResponse } from './user-response.dto';
+import { type UserResponseDto } from './user-response.dto';
 
 export class TokenPayload {
   accessToken!: string;
 
-  user!: UserResponse;
+  user!: UserResponseDto;
 }

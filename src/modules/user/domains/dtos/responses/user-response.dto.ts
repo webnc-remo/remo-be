@@ -3,7 +3,7 @@ import { IsUUID } from 'class-validator';
 
 import { EmailFieldOptional } from '../../../../../decorators';
 
-export class UserResponse {
+export class UserResponseDto {
   @ApiProperty({
     example: 'b0535d19-a172-4f66-acff-ce6b28c369d2',
     description: 'User id',
@@ -17,4 +17,10 @@ export class UserResponse {
   })
   @EmailFieldOptional({ nullable: true })
   email?: string | null;
+
+  @ApiProperty({
+    example: 'https://example.com/avatar.png',
+    description: 'User avatar',
+  })
+  avatar?: string | null;
 }

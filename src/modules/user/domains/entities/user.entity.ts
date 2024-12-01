@@ -9,13 +9,16 @@ export class UserEntity {
   email!: string | null;
 
   @Column({ nullable: true, type: 'varchar' })
+  avatar!: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
   password!: string | null;
 
-  @Column({ type: 'varchar' })
-  socialProvider!: string;
+  @Column({ type: 'varchar', nullable: true })
+  socialProvider!: string | null;
 
-  @Column({ type: 'varchar' })
-  socialProviderd!: string;
+  @Column({ type: 'varchar', nullable: true })
+  socialProviderd!: string | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
