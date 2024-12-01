@@ -5,10 +5,8 @@ import {
   HttpStatus,
   Inject,
   Post,
-  Res,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
 
 import { PublicRoute } from '../../../decorators';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
@@ -34,16 +32,9 @@ export class AuthController {
     description: 'Register failed',
   })
   @PublicRoute(true)
-  async register(
-    @Body() registerRequestDto: RegisterRequestDto,
-    @Res() res: Response,
-  ) {
-    try {
-      const user = await this.authService.handleRegister(registerRequestDto);
+  async register(@Body() registerRequestDto: RegisterRequestDto) {
+    const user = await this.authService.handleRegister(registerRequestDto);
 
-      return res.status(HttpStatus.CREATED).json(user);
-    } catch (error) {
-      return res.status(HttpStatus.NOT_FOUND).json(error);
-    }
+    return user;
   }
 }

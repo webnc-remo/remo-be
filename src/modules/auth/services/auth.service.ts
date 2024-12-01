@@ -7,7 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { generateHash } from '../../../common/utils';
+import { generateHash, handleError } from '../../../common/utils';
 import { IUserService } from '../../user/services/user.service';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
 import { DecodedToken } from '../domains/dtos/responses/decoded-token.dto';
@@ -63,7 +63,6 @@ export class AuthService implements IAuthService {
 
       const refreshToken = await this.signRefreshToken(user.id);
       const accessToken = this.jwtService.sign({ userId: user.id });
-      this.logger.log(accessToken);
 
       return {
         accessToken,
@@ -71,9 +70,7 @@ export class AuthService implements IAuthService {
         user,
       };
     } catch (error) {
-      this.logger.error(error);
-
-      throw error;
+      throw handleError(this.logger, error);
     }
   }
 
@@ -99,9 +96,7 @@ export class AuthService implements IAuthService {
 
       return refreshToken;
     } catch (error) {
-      this.logger.error(error);
-
-      throw error;
+      throw handleError(this.logger, error);
     }
   }
 }
