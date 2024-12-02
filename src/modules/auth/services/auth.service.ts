@@ -31,6 +31,9 @@ export interface IAuthService {
     user: UserInfoDto,
     refreshToken: RefreshTokenRequestDto,
   ): Promise<LogoutResponseDto | null>;
+  handleGoogleLogin(
+    loginResponseDto: LoginRequestDto,
+  ): Promise<LoginResponseDto | null>;
 }
 
 @Injectable()
@@ -172,6 +175,23 @@ export class AuthService implements IAuthService {
       return {
         message: 'Logged out',
         userId: removedToken.userId,
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  public async handleGoogleLogin(
+    userInfo: UserInfoDto,
+  ): Promise<LoginResponseDto | null> {
+    try {
+      const refreshToken = await this.signRefreshToken(userInfo);
+      const accessToken = this.jwtService.sign(userInfo);
+
+      return {
+        accessToken,
+        refreshToken,
+        user: userInfo,
       };
     } catch (error) {
       throw handleError(this.logger, error);
