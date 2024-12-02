@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { GoogleAccount } from '../../auth/domains/dtos/requests/google.dto';
 import { UserRequestDto } from '../domains/dtos/requests/user.dto';
 import { UserEntity } from '../domains/entities/user.entity';
 
 export interface IUserRepository {
   findUserByEmail(email: string): Promise<UserEntity | null>;
   createUser(user: UserRequestDto): Promise<UserEntity | null>;
+  createUserWithGoogleLogin(
+    googleAccount: GoogleAccount,
+  ): Promise<UserEntity | null>;
 }
 
 @Injectable()
@@ -31,5 +35,17 @@ export class UserRepository implements IUserRepository {
     });
 
     return user || null;
+  }
+
+  async createUserWithGoogleLogin(
+    googleAccount: GoogleAccount,
+  ): Promise<UserEntity> {
+    return this.userRepository.save({
+      email: googleAccount.email,
+      avatar: googleAccount.avatar,
+      socialProvider: 'google',
+      password: '',
+      createdAt: new Date(),
+    });
   }
 }

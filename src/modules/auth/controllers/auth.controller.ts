@@ -1,11 +1,16 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
   Post,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -13,18 +18,21 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request, Response } from 'express';
 
 import { AuthUser, PublicRoute } from '../../../decorators';
+import { GoogleOauthGuard } from '../../../guards/google-oauth.guard';
 import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RefreshTokenRequestDto } from '../domains/dtos/requests/refresh-token.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
 import { IAuthService } from '../services/auth.service';
 
-@Controller('/api/v1/auth')
+@Controller('/v1/auth')
 @ApiTags('auth')
 export class AuthController {
   constructor(
+    private readonly configService: ConfigService,
     @Inject('IAuthService')
     private readonly authService: IAuthService,
   ) {}
@@ -65,7 +73,7 @@ export class AuthController {
     return user;
   }
 
-  @Post('logout')
+  @Post('/logout')
   @ApiOperation({ summary: 'Logout' })
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiResponse({
@@ -84,5 +92,39 @@ export class AuthController {
     const removedToken = await this.authService.handleLogout(user, token);
 
     return removedToken;
+  }
+
+  @Get('/google')
+  @ApiOperation({ summary: 'Login with Google' })
+  @HttpCode(HttpStatus.CREATED)
+  @PublicRoute(true)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Login with OAuth Google successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Login with OAuth Google failed',
+  })
+  @UseGuards(GoogleOauthGuard)
+  @PublicRoute(true)
+  async googleLogin(@Req() req: Request, @Res() res: Response) {
+    const clientHost = `${this.configService.get<string>('CLIENT_HOST')}`;
+
+    const { error } = req.query as { error?: string };
+
+    if (error) {
+      return res.redirect(`${clientHost}/login`);
+    }
+
+    const userInfoDto = req.user as UserInfoDto;
+
+    const loginDto = await this.authService.handleGoogleLogin(userInfoDto);
+
+    const redirectUrl =
+      `${clientHost}/` +
+      `login/?access_token=${loginDto?.accessToken}&refresh_token=${loginDto?.refreshToken}`;
+
+    return res.redirect(redirectUrl);
   }
 }

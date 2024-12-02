@@ -7,6 +7,7 @@ import {
 
 import { handleError } from '../../../common/utils';
 import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
+import { GoogleAccount } from '../../auth/domains/dtos/requests/google.dto';
 import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
 import { UserResponseDto } from '../domains/dtos/responses/user-response.dto';
 import { UserEntity } from '../domains/entities/user.entity';
@@ -16,6 +17,9 @@ export interface IUserService {
   getUserByEmail(email: string): Promise<UserEntity | null>;
   createUser(registerRequest: RegisterRequestDto): Promise<UserResponseDto>;
   getUserProfile(userId: string): Promise<ProfileResponseDto>;
+  createUserWithGoogleLogin(
+    googleAccount: GoogleAccount,
+  ): Promise<UserEntity | null>;
 }
 
 @Injectable()
@@ -71,6 +75,19 @@ export class UserService implements IUserService {
       this.logger.error(error);
 
       throw error;
+    }
+  }
+
+  async createUserWithGoogleLogin(
+    googleAccount: GoogleAccount,
+  ): Promise<UserEntity | null> {
+    try {
+      const user =
+        await this.userRepository.createUserWithGoogleLogin(googleAccount);
+
+      return user;
+    } catch (error) {
+      throw handleError(this.logger, error);
     }
   }
 }
