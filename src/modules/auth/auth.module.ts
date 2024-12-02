@@ -11,6 +11,7 @@ import { UserModule } from '../user/user.module';
 import { AuthController } from './controllers/auth.controller';
 import { AuthRepository } from './repository/auth.repository';
 import { AuthService } from './services/auth.service';
+import { GoogleOauthStrategy } from './services/strategies/google.strategy';
 import { JwtStrategy } from './services/strategies/jwt.strategy';
 
 @Module({
@@ -34,6 +35,7 @@ import { JwtStrategy } from './services/strategies/jwt.strategy';
   providers: [
     AuthService,
     JwtStrategy,
+    GoogleOauthStrategy,
     {
       provide: 'IAuthService',
       useClass: AuthService,
