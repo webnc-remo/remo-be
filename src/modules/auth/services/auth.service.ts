@@ -79,7 +79,12 @@ export class AuthService implements IAuthService {
         password: hashedPassword,
       });
 
-      const userInfo: UserInfoDto = { id: user.id, email: user.email };
+      const userInfo: UserInfoDto = {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        avatar: user.avatar,
+      };
       const refreshToken = await this.signRefreshToken(userInfo);
       const accessToken = this.jwtService.sign(userInfo);
 
@@ -148,14 +153,19 @@ export class AuthService implements IAuthService {
         throw new BadRequestException('Password is incorrect');
       }
 
-      const userInfo: UserInfoDto = { id: user.id, email: user.email };
+      const userInfo: UserInfoDto = {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        avatar: user.avatar,
+      };
       const refreshToken = await this.signRefreshToken(userInfo);
       const accessToken = this.jwtService.sign(userInfo);
 
       return {
         accessToken,
         refreshToken,
-        user,
+        user: userInfo,
       };
     } catch (error) {
       throw handleError(this.logger, error);

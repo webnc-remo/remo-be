@@ -9,13 +9,13 @@ import { handleError } from '../../../common/utils';
 import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
 import { GoogleAccount } from '../../auth/domains/dtos/requests/google.dto';
 import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
-import { UserResponseDto } from '../domains/dtos/responses/user-response.dto';
+import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { UserEntity } from '../domains/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
 
 export interface IUserService {
   getUserByEmail(email: string): Promise<UserEntity | null>;
-  createUser(registerRequest: RegisterRequestDto): Promise<UserResponseDto>;
+  createUser(registerRequest: RegisterRequestDto): Promise<UserInfoDto>;
   getUserProfile(userId: string): Promise<ProfileResponseDto>;
   createUserWithGoogleLogin(
     googleAccount: GoogleAccount,
@@ -43,11 +43,15 @@ export class UserService implements IUserService {
     }
   }
 
-  async createUser(
-    registerRequest: RegisterRequestDto,
-  ): Promise<UserResponseDto> {
+  async createUser(registerRequest: RegisterRequestDto): Promise<UserInfoDto> {
     try {
-      const user = await this.userRepository.createUser(registerRequest);
+      const userEntity = await this.userRepository.createUser(registerRequest);
+      const user: UserInfoDto = {
+        id: userEntity.id,
+        email: userEntity.email,
+        fullName: userEntity.fullName,
+        avatar: userEntity.avatar,
+      };
 
       return user;
     } catch (error) {

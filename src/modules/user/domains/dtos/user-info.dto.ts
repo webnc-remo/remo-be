@@ -17,4 +17,16 @@ export class UserInfoDto {
   })
   @EmailFieldOptional({ nullable: true })
   email?: string | null;
+
+  @ApiProperty({
+    example: 'Tan Tran',
+    description: 'User name',
+  })
+  fullName?: string | null;
+
+  @ApiProperty({
+    example: 'https://google.com/avatar.jpg',
+    description: 'User avatar',
+  })
+  avatar?: string | null;
 }
