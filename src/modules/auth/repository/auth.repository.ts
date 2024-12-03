@@ -15,6 +15,7 @@ export interface IAuthRepository {
     userId: string,
     token: string,
   ): Promise<RefreshTokenEntity>;
+  isTokenExist(userId: string, refreshToken: string): Promise<boolean>;
 }
 
 @Injectable()
@@ -55,5 +56,16 @@ export class AuthRepository implements IAuthRepository {
     const result = await this.tokenRepository.remove(removedToken);
 
     return result;
+  }
+
+  async isTokenExist(userId: string, refreshToken: string): Promise<boolean> {
+    const token = await this.tokenRepository.findOne({
+      where: {
+        userId,
+        token: refreshToken,
+      },
+    });
+
+    return Boolean(token);
   }
 }
