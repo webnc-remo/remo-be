@@ -19,7 +19,7 @@ import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { IUserService } from '../services/user.service';
 
-@Controller('/api/v1/user')
+@Controller('/v1/user')
 @ApiTags('user')
 export class UserController {
   constructor(

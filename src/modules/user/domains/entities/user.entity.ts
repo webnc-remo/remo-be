@@ -9,6 +9,9 @@ export class UserEntity {
   email!: string | null;
 
   @Column({ nullable: true, type: 'varchar' })
+  fullName!: string | null;
+
+  @Column({ nullable: true, type: 'varchar' })
   avatar!: string | null;
 
   @Column({ nullable: true, type: 'varchar' })
@@ -16,9 +19,6 @@ export class UserEntity {
 
   @Column({ type: 'varchar', nullable: true })
   socialProvider!: string | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  socialProviderId!: string | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;

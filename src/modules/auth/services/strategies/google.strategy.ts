@@ -33,6 +33,8 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
       email: profile._json.email ?? '',
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       avatar: profile._json.picture ?? '',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      fullName: profile._json.name ?? '',
     };
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -48,6 +50,8 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
     const userInfo: UserInfoDto = {
       id: user?.id ?? '',
       email: user?.email ?? '',
+      fullName: user?.fullName ?? '',
+      avatar: user?.avatar ?? '',
     };
 
     return userInfo;

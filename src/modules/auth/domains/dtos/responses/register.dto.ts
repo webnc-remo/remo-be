@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString } from 'class-validator';
 
-import { UserResponseDto } from '../../../../user/domains/dtos/responses/user-response.dto';
+import { UserInfoDto } from '../../../../user/domains/dtos/user-info.dto';
 
 export class RegisterResponseDto {
   @ApiProperty({
@@ -22,6 +22,6 @@ export class RegisterResponseDto {
   @ApiProperty({
     description: 'User',
   })
-  @Type(() => UserResponseDto)
-  user!: UserResponseDto;
+  @Type(() => UserInfoDto)
+  user!: UserInfoDto;
 }

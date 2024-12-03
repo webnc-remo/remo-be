@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString } from 'class-validator';
 
-import { UserResponseDto } from '../../../../user/domains/dtos/responses/user-response.dto';
+import { UserInfoDto } from '../../../../user/domains/dtos/user-info.dto';
 
 export class LoginResponseDto {
   @ApiProperty({
@@ -19,6 +19,6 @@ export class LoginResponseDto {
   @IsString()
   refreshToken!: string;
 
-  @Type(() => UserResponseDto)
-  user!: UserResponseDto;
+  @Type(() => UserInfoDto)
+  user!: UserInfoDto;
 }
