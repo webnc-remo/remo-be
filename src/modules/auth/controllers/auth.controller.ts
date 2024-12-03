@@ -127,4 +127,22 @@ export class AuthController {
 
     return res.redirect(redirectUrl);
   }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'Get new access token' })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Get new access token successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Get new access token failed',
+  })
+  @PublicRoute(true)
+  async renewToken(@Body() token: RefreshTokenRequestDto) {
+    const newPairToken = await this.authService.renewToken(token);
+
+    return newPairToken;
+  }
 }

@@ -18,6 +18,7 @@ import { DecodedTokenDto } from '../domains/dtos/responses/decoded-token.dto';
 import { LoginResponseDto } from '../domains/dtos/responses/login.dto';
 import { LogoutResponseDto } from '../domains/dtos/responses/logout.dto';
 import { RegisterResponseDto } from '../domains/dtos/responses/register.dto';
+import { TokenPayloadResponseDto } from '../domains/dtos/responses/token.dto';
 import { AuthRepository } from '../repository/auth.repository';
 
 export interface IAuthService {
@@ -34,6 +35,9 @@ export interface IAuthService {
   handleGoogleLogin(
     loginResponseDto: LoginRequestDto,
   ): Promise<LoginResponseDto | null>;
+  renewToken(
+    refreshToken: RefreshTokenRequestDto,
+  ): Promise<TokenPayloadResponseDto>;
 }
 
 @Injectable()
@@ -203,6 +207,53 @@ export class AuthService implements IAuthService {
         refreshToken,
         user: userInfo,
       };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async renewToken(
+    refreshToken: RefreshTokenRequestDto,
+  ): Promise<TokenPayloadResponseDto> {
+    try {
+      const secretKey =
+        this.configService.get<string>('JWT_REFRESH_SECRET') ??
+        'default_token_key';
+      const decoded: DecodedTokenDto = this.jwtService.verify(
+        refreshToken.refreshToken,
+        {
+          secret: secretKey,
+        },
+      );
+      const userInfoDto: UserInfoDto = {
+        id: decoded.id,
+        email: decoded.email,
+      };
+
+      const isTokenExisted = await this.authRepository.isTokenExist(
+        userInfoDto.id,
+        refreshToken.refreshToken,
+      );
+
+      if (!isTokenExisted) {
+        throw new NotFoundException('Token not found');
+      }
+
+      const [newRefreshToken] = await Promise.all([
+        this.signRefreshToken(userInfoDto),
+        this.authRepository.removeRefreshToken(
+          userInfoDto.id,
+          refreshToken.refreshToken,
+        ),
+      ]);
+
+      const tokenPayload: TokenPayloadResponseDto = {
+        accessToken: this.jwtService.sign(userInfoDto),
+        refreshToken: newRefreshToken,
+        user: userInfoDto,
+      };
+
+      return tokenPayload;
     } catch (error) {
       throw handleError(this.logger, error);
     }
