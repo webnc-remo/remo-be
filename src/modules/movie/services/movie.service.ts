@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { handleError } from '../../../common/utils';
-import { MovieEntity } from '../domains/schemas/movie.entity';
+import { MovieEntity } from '../domains/schemas/movie.schema';
 import { MoviesRepository } from '../repository/movie.repository';
 
 @Injectable()

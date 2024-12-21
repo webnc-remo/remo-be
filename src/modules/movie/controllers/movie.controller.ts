@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 
 import { PublicRoute } from '../../../decorators';
-import { MovieEntity } from '../domains/schemas/movie.entity';
+import { MovieEntity } from '../domains/schemas/movie.schema';
 import { MoviesService } from '../services/movie.service';
 
 @Controller('/v1/movies')

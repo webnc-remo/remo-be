@@ -36,7 +36,7 @@ import { SharedModule } from './shared/shared.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],
-      // name: 'mongodbConnection',
+      name: 'mongodbConnection',
       useFactory: (configService: ApiConfigService): TypeOrmModuleOptions => ({
         ...configService.mongoConfig,
         type: 'mongodb',
@@ -46,6 +46,27 @@ import { SharedModule } from './shared/shared.module';
         if (!options) {
           throw new Error('Invalid options passed');
         }
+
+        const dataSource = new DataSource(options);
+        if (!dataSource.isInitialized) {
+          return dataSource.initialize();
+        }
+
+        return Promise.resolve(dataSource);
+      },
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [SharedModule],
+      name: 'postgresConnection',
+      useFactory: (configService: ApiConfigService): TypeOrmModuleOptions => ({
+        ...configService.postgresConfig,
+      }),
+      inject: [ApiConfigService],
+      dataSourceFactory: (options) => {
+        if (!options) {
+          throw new Error('Invalid options passed');
+        }
+
         const dataSource = new DataSource(options);
         if (!dataSource.isInitialized) {
           return dataSource
@@ -56,28 +77,6 @@ import { SharedModule } from './shared/shared.module';
         return Promise.resolve(addTransactionalDataSource(dataSource));
       },
     }),
-    // TypeOrmModule.forRootAsync({
-    //   imports: [SharedModule],
-    //   name: 'postgresConnection',
-    //   useFactory: (configService: ApiConfigService): TypeOrmModuleOptions => ({
-    //     ...configService.postgresConfig,
-    //   }),
-    //   inject: [ApiConfigService],
-    //   dataSourceFactory: (options) => {
-    //     if (!options) {
-    //       throw new Error('Invalid options passed');
-    //     }
-
-    //     const dataSource = new DataSource(options);
-    //     if (!dataSource.isInitialized) {
-    //       return dataSource
-    //         .initialize()
-    //         .then(() => addTransactionalDataSource(dataSource));
-    //     }
-
-    //     return Promise.resolve(addTransactionalDataSource(dataSource));
-    //   },
-    // }),
   ],
   providers: [],
 })

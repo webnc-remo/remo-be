@@ -16,8 +16,8 @@ import { JwtStrategy } from './services/strategies/jwt.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RefreshTokenEntity]),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([RefreshTokenEntity], 'postgresConnection'),
+    TypeOrmModule.forFeature([UserEntity], 'postgresConnection'),
     UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToMany, ObjectId, ObjectIdColumn } from 'typeorm';
 
-import { MovieEntity } from './movie.entity';
+import { MovieEntity } from './movie.schema';
 
-@Entity('genres')
+@Entity('movie_genres')
 export class GenreEntity {
   @ObjectIdColumn() id?: ObjectId;
 

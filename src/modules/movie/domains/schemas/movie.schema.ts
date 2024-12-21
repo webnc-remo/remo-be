@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { Column, Entity, JoinTable, ManyToMany, ObjectIdColumn } from 'typeorm';
 
-import { GenreEntity } from './movie-genre.entity';
+import { GenreEntity } from './movie-genre.schema';
 
 class BelongsToCollection {
   @Column()

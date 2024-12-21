@@ -83,8 +83,7 @@ export class ApiConfigService {
 
   get postgresConfig(): TypeOrmModuleOptions {
     const entities = [
-      __dirname + '/../../modules/**/**/**/*.entity{.ts,.js}',
-      __dirname + '/../../modules/**/**/**/*.view-entity{.ts,.js}',
+      __dirname + '/../../modules/**/**/entities/*.entity{.ts,.js}',
     ];
     const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
 
@@ -102,6 +101,7 @@ export class ApiConfigService {
       migrationsRun: true,
       logging: this.getBoolean('ENABLE_ORM_LOGS'),
       namingStrategy: new SnakeNamingStrategy(),
+      name: 'postgresConnection',
     };
   }
 
@@ -112,14 +112,14 @@ export class ApiConfigService {
     const database = this.configService.get<string>('MONGO_DATABASE');
     const options = this.configService.get<string>('MONGO_OPTIONS', '');
     const entities = [
-      __dirname + '/../../modules/**/**/**/*.entity{.ts,.js}',
-      __dirname + '/../../modules/**/**/**/*.view-entity{.ts,.js}',
+      __dirname + '/../../modules/**/**/schemas/*.schema{.ts,.js}',
     ];
-    const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
 
     return {
+      name: 'mongodbConnection',
       entities,
-      migrations,
+      keepConnectionAlive: !this.isTest,
+      dropSchema: this.isTest,
       type: 'mongodb',
       host,
       username,

@@ -11,8 +11,8 @@ import { UserService } from './services/user.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
-    TypeOrmModule.forFeature([RefreshTokenEntity]),
+    TypeOrmModule.forFeature([UserEntity], 'postgresConnection'),
+    TypeOrmModule.forFeature([RefreshTokenEntity], 'postgresConnection'),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
