@@ -105,6 +105,31 @@ export class ApiConfigService {
     };
   }
 
+  get mongoConfig() {
+    const username = this.configService.get<string>('MONGO_USERNAME');
+    const password = this.configService.get<string>('MONGO_PASSWORD') ?? '';
+    const host = this.configService.get<string>('MONGO_HOST');
+    const database = this.configService.get<string>('MONGO_DATABASE');
+    const options = this.configService.get<string>('MONGO_OPTIONS', '');
+    const entities = [
+      __dirname + '/../../modules/**/**/**/*.entity{.ts,.js}',
+      __dirname + '/../../modules/**/**/**/*.view-entity{.ts,.js}',
+    ];
+    const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
+
+    return {
+      entities,
+      migrations,
+      type: 'mongodb',
+      host,
+      username,
+      password,
+      database,
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      url: `mongodb+srv://${username}:${encodeURIComponent(password ?? '')}@${host}/${database}${options ? `?${options}` : ''}`,
+    };
+  }
+
   get awsS3Config() {
     return {
       bucketRegion: this.getString('AWS_S3_BUCKET_REGION'),
@@ -134,17 +159,6 @@ export class ApiConfigService {
     return this.getBoolean('REDIS_CACHE_ENABLED');
   }
 
-  get redisCacheConfig() {
-    return {
-      socket: {
-        host: this.getString('REDIS_HOST'),
-        port: this.getNumber('REDIS_PORT'),
-      },
-      ttl: this.getNumber('REDIS_CACHE_TTL'),
-      max: this.getNumber('REDIS_CACHE_MAX'),
-    };
-  }
-
   get authConfig() {
     return {
       privateKey: this.getString('JWT_PRIVATE_KEY'),
@@ -167,28 +181,5 @@ export class ApiConfigService {
     }
 
     return value;
-  }
-
-  get Puppeteer() {
-    return {
-      puppeteer: this.getString('PUPPETEER_SCREENSHOT_URL'),
-      headlessBrowser: this.getString('HEADLESS_BROWSER_URL'),
-    };
-  }
-
-  get imageIdGetterUrl() {
-    return this.getString('IMAGE_ID_GETTER_URL');
-  }
-
-  get otableConfig() {
-    return {
-      clientId: this.getString('OTABLE_CLIENT_ID'),
-      clientSecret: this.getString('OTABLE_CLIENT_SECRET'),
-      callback: this.getString('CALLBACK_URL'),
-      authorizationUrl: this.getString('OAUTH_AUTHORIZATION_URL'),
-      tokenApi: this.getString('OAUTH_TOKEN_URL'),
-      userInfoApi: this.getString('OAUTH_USER_INFO_URL'),
-      grantType: this.getString('GRANT_TYPE'),
-    };
   }
 }
