@@ -30,7 +30,7 @@ export class MoviesRepository {
     const items = await this.movieRepository.find({
       where: filter,
       select: [
-        'tmdbId',
+        'tmdb_id',
         'title',
         'original_title',
         'poster_path',
