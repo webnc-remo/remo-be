@@ -2,13 +2,15 @@ name: CI Pipeline
 
 on:
   push:
-    branches: ['main', 'dev']
+    branches: ['main', 'dev', 'setup/ci-cd']
+  pull_request:
+    branches: ['main', 'dev', 'setup/ci-cd']
 
 jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
 
     steps:
       - name: Check out Git repository
@@ -39,11 +41,13 @@ jobs:
         run: npx prettier --check '**/*.ts'
 
   build-and-push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
     needs: run-linters
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Check out the code
