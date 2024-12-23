@@ -2,14 +2,13 @@ name: CI Pipeline
 
 on:
   push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+    branches: ['main', 'dev']
 
 jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - name: Check out Git repository
