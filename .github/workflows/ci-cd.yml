@@ -3,22 +3,20 @@ name: CI Pipeline
 on:
   push:
     branches: ['main', 'dev']
+  pull_request:
+    branches: ['main', 'dev']
 
 jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
-
       - name: Cache Node.js modules
         uses: actions/cache@v3
         with:
@@ -26,51 +24,65 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
       - name: Install Node.js dependencies
         run: npm install
-
       - name: Run ESLint
         run: npx eslint '**/*.ts'
         env:
           CI: true
-
       - name: Run Prettier
         run: npx prettier --check '**/*.ts'
 
   build-and-push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
     needs: run-linters
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Check out the code
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v1
 
-      - name: Cache Docker layers
-        uses: actions/cache@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Convert tag to lowercase
-        id: lower_tag
-        run: echo "tag=$(echo ghcr.io/${{ github.repository }}/my-app:${{ github.sha }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Set image name
+        id: image_name
+        run: echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/remo-be:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ env.tag }}
+          tags: ${{ env.IMAGE_NAME }}
 
-      - name: Logout from GitHub Container Registry
-        run: docker logout ghcr.io
+      - name: Logout from Docker Hub
+        run: docker logout
+
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ./remo-deployment
+            bash ./deploy.sh
