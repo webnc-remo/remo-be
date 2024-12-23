@@ -85,4 +85,4 @@ jobs:
           port: 22
           script: |
             cd ./remo-deployment
-            bash ./deploy.sh
+            bash ./deploy.sh backend ${{ github.sha }}
