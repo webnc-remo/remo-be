@@ -30,7 +30,7 @@ jobs:
 
       - name: Set image name
         id: image_name
-        run: echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/remo-be:lastest" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/remo-be:latest" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
