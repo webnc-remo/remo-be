@@ -7,12 +7,45 @@ on:
     branches: ['main', 'dev', 'setup/ci-cd']
 
 jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npx eslint '**/*.ts'
+        env:
+          CI: true
+
+      - name: Run Prettier
+        run: npx prettier --check '**/*.ts'
+
   build-and-push:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
+    needs: run-linters
     if: ${{ github.event_name == 'push' }}
 
     steps:
