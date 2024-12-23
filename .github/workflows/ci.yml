@@ -30,14 +30,14 @@ jobs:
 
       - name: Set image name
         id: image_name
-        run: echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/remo-be:latest" >> $GITHUB_OUTPUT
+        run: echo "IMAGE_NAME=${{ secrets.DOCKERHUB_USERNAME }}/remo-be:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.image_name.outputs.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_NAME }}
 
       - name: Logout from Docker Hub
         run: docker logout
