@@ -90,5 +90,5 @@ jobs:
           key: ${{ secrets.SERVER_PRIVATE_KEY }}
           port: 22
           script: |
-            cd /path/to/remo-deployment
+            cd /remo-deployment
             bash ./deploy.sh
