@@ -1,4 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Query,
+} from '@nestjs/common';
 import {
   ApiNotFoundResponse,
   ApiOperation,
@@ -31,5 +38,23 @@ export class MoviesController {
     const movies = await this.moviesService.search(pageOptionsDto);
 
     return movies;
+  }
+
+  @Get('/trending/:type')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Get trending movies' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Movies retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Movies not found',
+  })
+  async trending(@Param('type') type: string) {
+    const movies = await this.moviesService.trending(type);
+
+    return { results: movies };
   }
 }
