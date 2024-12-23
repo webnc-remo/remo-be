@@ -17,7 +17,7 @@ export interface IUserRepository {
 @Injectable()
 export class UserRepository implements IUserRepository {
   constructor(
-    @InjectRepository(UserEntity)
+    @InjectRepository(UserEntity, 'postgresConnection')
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 

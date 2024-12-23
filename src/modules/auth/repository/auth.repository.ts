@@ -21,7 +21,7 @@ export interface IAuthRepository {
 @Injectable()
 export class AuthRepository implements IAuthRepository {
   constructor(
-    @InjectRepository(RefreshTokenEntity)
+    @InjectRepository(RefreshTokenEntity, 'postgresConnection')
     private readonly tokenRepository: Repository<RefreshTokenEntity>,
   ) {}
 
