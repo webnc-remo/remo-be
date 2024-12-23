@@ -50,6 +50,90 @@ class SpokenLanguage {
   name!: string;
 }
 
+class CreditCast {
+  @Column()
+  adult!: boolean;
+
+  @Column()
+  gender!: number;
+
+  @Column()
+  id!: number;
+
+  @Column()
+  known_for_department!: string;
+
+  @Column()
+  name!: string;
+
+  @Column()
+  original_name!: string;
+
+  @Column('float')
+  popularity!: number;
+
+  @Column({ nullable: true })
+  profile_path!: string;
+
+  @Column()
+  cast_id!: number;
+
+  @Column()
+  character!: string;
+
+  @Column()
+  credit_id!: string;
+
+  @Column()
+  order!: number;
+}
+
+class CreditCrew {
+  @Column()
+  adult!: boolean;
+
+  @Column()
+  gender!: number;
+
+  @Column()
+  id!: number;
+
+  @Column()
+  known_for_department!: string;
+
+  @Column()
+  name!: string;
+
+  @Column()
+  original_name!: string;
+
+  @Column('float')
+  popularity!: number;
+
+  @Column({ nullable: true })
+  profile_path!: string;
+
+  @Column()
+  credit_id!: string;
+
+  @Column()
+  department!: string;
+
+  @Column()
+  job!: string;
+}
+
+class Credits {
+  @Column()
+  id!: number;
+
+  @Column(() => CreditCast)
+  cast!: CreditCast[];
+
+  @Column(() => CreditCrew)
+  crew!: CreditCrew[];
+}
+
 @Entity('movies')
 export class MovieEntity {
   @ObjectIdColumn() id?: ObjectId;
@@ -68,6 +152,9 @@ export class MovieEntity {
 
   @Column()
   budget!: number;
+
+  @Column('simple-array')
+  categories!: string[];
 
   @ManyToMany(() => GenreEntity, (genre) => genre.movies)
   @JoinTable()
@@ -132,4 +219,7 @@ export class MovieEntity {
 
   @Column()
   vote_count!: number;
+
+  @Column(() => Credits)
+  credits!: Credits;
 }

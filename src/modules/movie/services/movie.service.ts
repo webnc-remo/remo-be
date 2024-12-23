@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { handleError } from '../../../common/utils';
-import { MovieEntity } from '../domains/schemas/movie.schema';
 import { MoviesRepository } from '../repository/movie.repository';
 
 @Injectable()
@@ -12,9 +12,9 @@ export class MoviesService {
     this.logger = new Logger(MoviesService.name);
   }
 
-  async search(query: string): Promise<MovieEntity[]> {
+  async search(pageOptionsDto: PageOptionsDto) {
     try {
-      const movies = await this.moviesRepository.search(query);
+      const movies = await this.moviesRepository.search(pageOptionsDto);
 
       return movies;
     } catch (error) {

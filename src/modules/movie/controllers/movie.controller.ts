@@ -6,8 +6,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { PublicRoute } from '../../../decorators';
-import { MovieEntity } from '../domains/schemas/movie.schema';
 import { MoviesService } from '../services/movie.service';
 
 @Controller('/v1/movies')
@@ -27,8 +27,8 @@ export class MoviesController {
     status: HttpStatus.NOT_FOUND,
     description: 'Movies not found',
   })
-  async search(@Query('query') query: string): Promise<MovieEntity[]> {
-    const movies = await this.moviesService.search(query);
+  async search(@Query() pageOptionsDto: PageOptionsDto) {
+    const movies = await this.moviesService.search(pageOptionsDto);
 
     return movies;
   }
