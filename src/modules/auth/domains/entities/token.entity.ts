@@ -8,8 +8,10 @@ export class RefreshTokenEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
-  userId!: string;
+  @ManyToOne(() => UserEntity, (user) => user.refreshTokensEntity, {
+    onDelete: 'CASCADE',
+  })
+  user!: UserEntity;
 
   @Column({ type: 'varchar' })
   token!: string;

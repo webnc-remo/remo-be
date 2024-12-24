@@ -188,7 +188,7 @@ export class AuthService implements IAuthService {
 
       return {
         message: 'Logged out',
-        userId: removedToken.userId,
+        userId: removedToken.user.id,
       };
     } catch (error) {
       throw handleError(this.logger, error);

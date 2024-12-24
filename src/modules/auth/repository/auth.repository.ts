@@ -31,7 +31,9 @@ export class AuthRepository implements IAuthRepository {
     decodedToken: DecodedTokenDto,
   ): Promise<RefreshTokenEntity | null> {
     return this.tokenRepository.save({
-      userId,
+      user: {
+        id: userId,
+      },
       token: refreshToken,
       iat: new Date(decodedToken.iat * 1000),
       exp: new Date(decodedToken.exp * 1000),
@@ -44,9 +46,12 @@ export class AuthRepository implements IAuthRepository {
   ): Promise<RefreshTokenEntity> {
     const removedToken = await this.tokenRepository.findOne({
       where: {
-        userId,
         token,
+        user: {
+          id: userId,
+        },
       },
+      relations: ['user'],
     });
 
     if (!removedToken) {
@@ -61,7 +66,9 @@ export class AuthRepository implements IAuthRepository {
   async isTokenExist(userId: string, refreshToken: string): Promise<boolean> {
     const token = await this.tokenRepository.findOne({
       where: {
-        userId,
+        user: {
+          id: userId,
+        },
         token: refreshToken,
       },
     });
