@@ -8,6 +8,7 @@ import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { MoviesModule } from './modules/movie/movie.module';
+import { PeopleModule } from './modules/people/people.module';
 import { UserModule } from './modules/user/user.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
@@ -17,6 +18,7 @@ import { SharedModule } from './shared/shared.module';
     UserModule,
     AuthModule,
     MoviesModule,
+    PeopleModule,
     ClsModule.forRoot({
       global: true,
       middleware: {

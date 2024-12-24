@@ -57,4 +57,23 @@ export class MoviesController {
 
     return { results: movies };
   }
+
+  @Get('/:id')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Get movie by id' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Movie retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Movie not found',
+  })
+  async getMovieById(@Param('id') id: string) {
+    const numberId = Number.parseInt(id, 10);
+    const movie = await this.moviesService.getMovieById(numberId);
+
+    return movie;
+  }
 }
