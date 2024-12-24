@@ -5,7 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { RefreshTokenEntity } from '../auth/domains/entities/token.entity';
 import { UserController } from './controllers/user.controller';
+import { RatingEntity } from './domains/entities/rating.entity';
 import { UserEntity } from './domains/entities/user.entity';
+import { UserMovieListEntity } from './domains/entities/user-movie-list.entity';
+import { UserMovieListItemEntity } from './domains/entities/user-movie-list-item.entity';
 import { UserRepository } from './repository/user.repository';
 import { UserService } from './services/user.service';
 
@@ -13,6 +16,9 @@ import { UserService } from './services/user.service';
   imports: [
     TypeOrmModule.forFeature([UserEntity], 'postgresConnection'),
     TypeOrmModule.forFeature([RefreshTokenEntity], 'postgresConnection'),
+    TypeOrmModule.forFeature([UserMovieListEntity], 'postgresConnection'),
+    TypeOrmModule.forFeature([UserMovieListItemEntity], 'postgresConnection'),
+    TypeOrmModule.forFeature([RatingEntity], 'postgresConnection'),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
