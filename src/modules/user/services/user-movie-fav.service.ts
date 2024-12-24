@@ -28,6 +28,13 @@ export interface IUserFavMoviesService {
     userId: string,
     tmdbId: string,
   ): Promise<{ isFavorite: boolean }>;
+  getListMovies(
+    listId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<{
+    items: MovieEntity[];
+    meta: PageMetaDto;
+  }>;
 }
 
 @Injectable()
@@ -118,6 +125,30 @@ export class UserFavMoviesService implements IUserFavMoviesService {
       );
 
       return { isFavorite: Boolean(movieExists) };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async getListMovies(
+    listId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<{
+    items: MovieEntity[];
+    meta: PageMetaDto;
+  }> {
+    try {
+      const moviesInList =
+        await this.userFavMoviesRepository.getMoviesFromList(listId);
+
+      const movieIds = moviesInList.map((movie) => movie.tmdb_id);
+
+      const movies = await this.moviesService.getMoviesByIds(
+        movieIds,
+        pageOptionsDto,
+      );
+
+      return movies;
     } catch (error) {
       throw handleError(this.logger, error);
     }

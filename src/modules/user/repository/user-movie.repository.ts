@@ -11,6 +11,8 @@ export interface IUserFavMoviesRepository {
   addMovieToList(listId: string, tmdbId: string);
   removeMovieFromList(listId: string, tmdbId: string);
   getMovieIdsFromList(listId: string): Promise<string[]>;
+  getListById(listId: string): Promise<UserMovieListEntity | null>;
+  getMoviesFromList(listId: string): Promise<UserMovieListItemEntity[]>;
 }
 
 @Injectable()
@@ -67,5 +69,18 @@ export class UserFavMoviesRepository implements IUserFavMoviesRepository {
     });
 
     return movieIds.map((item) => item.tmdb_id);
+  }
+
+  async getListById(listId: string): Promise<UserMovieListEntity | null> {
+    return this.userMovieListRepository.findOne({
+      where: { id: listId },
+    });
+  }
+
+  async getMoviesFromList(listId: string): Promise<UserMovieListItemEntity[]> {
+    return this.userMovieListItemRepository.find({
+      where: { list: { id: listId } },
+      select: ['id', 'tmdb_id'],
+    });
   }
 }
