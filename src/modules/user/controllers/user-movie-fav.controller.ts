@@ -85,4 +85,24 @@ export class UserFavMoviesController {
   ) {
     return this.userService.getFavoriteList(userInfo.id, pageOptionsDto);
   }
+
+  @Get('/check/:tmdbId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Check if movie is in favorite list' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Returns whether movie is in favorites',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiBearerAuth()
+  async checkFavorite(
+    @AuthUser() userInfo: UserInfoDto,
+    @Param('tmdbId') tmdbId: string,
+  ) {
+    return this.userService.checkFavorite(userInfo.id, tmdbId);
+  }
 }
