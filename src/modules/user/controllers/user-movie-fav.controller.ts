@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  Param,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -15,38 +16,34 @@ import {
 
 import { AuthUser } from '../../../decorators';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
-import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
-import { IUserService } from '../services/user.service';
+import { IUserFavMoviesService } from '../services/user-movie-fav.service';
 
-@Controller('/v1/user')
+@Controller('/v1/user/fav')
 @ApiTags('user')
-export class UserController {
+export class UserFavMoviesController {
   constructor(
-    @Inject('IUserService')
-    private readonly userService: IUserService,
+    @Inject('IUserFavMoviesService')
+    private readonly userService: IUserFavMoviesService,
   ) {}
 
-  @Get('/profile')
+  @Get('/:tmdbId')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Get user profile' })
+  @ApiOperation({ summary: 'Add movie to favorite list' })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Profile retrieved successfully',
+    description: 'Movie added to favorite list',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
   @ApiBearerAuth()
-  async getProfile(
+  addFavorite(
     @AuthUser() userInfo: UserInfoDto,
-  ): Promise<ProfileResponseDto> {
-    const user: ProfileResponseDto = await this.userService.getUserProfile(
-      userInfo.id,
-    );
-
-    return user;
+    @Param('tmdbId') tmdbId: string,
+  ) {
+    return this.userService.addFavorite(userInfo.id, tmdbId);
   }
 }

@@ -5,12 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { RefreshTokenEntity } from '../auth/domains/entities/token.entity';
 import { UserController } from './controllers/user.controller';
+import { UserFavMoviesController } from './controllers/user-movie-fav.controller';
 import { RatingEntity } from './domains/entities/rating.entity';
 import { UserEntity } from './domains/entities/user.entity';
 import { UserMovieListEntity } from './domains/entities/user-movie-list.entity';
 import { UserMovieListItemEntity } from './domains/entities/user-movie-list-item.entity';
 import { UserRepository } from './repository/user.repository';
+import { UserFavMoviesRepository } from './repository/user-movie-fav.repository';
 import { UserService } from './services/user.service';
+import { UserFavMoviesService } from './services/user-movie-fav.service';
 
 @Module({
   imports: [
@@ -30,7 +33,7 @@ import { UserService } from './services/user.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UserController],
+  controllers: [UserController, UserFavMoviesController],
   exports: [UserService, 'IUserService'],
   providers: [
     {
@@ -41,6 +44,16 @@ import { UserService } from './services/user.service';
     {
       provide: 'IUserRepository',
       useClass: UserRepository,
+    },
+    {
+      provide: 'IUserFavMoviesService',
+      useClass: UserFavMoviesService,
+    },
+    UserFavMoviesService,
+    UserFavMoviesRepository,
+    {
+      provide: 'IUserFavMoviesRepository',
+      useClass: UserFavMoviesRepository,
     },
   ],
 })

@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Inject,
   Injectable,
   Logger,
@@ -10,7 +9,6 @@ import { handleError } from '../../../common/utils';
 import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
 import { GoogleAccount } from '../../auth/domains/dtos/requests/google.dto';
 import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
-import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { UserEntity } from '../domains/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
@@ -22,7 +20,6 @@ export interface IUserService {
   createUserWithGoogleLogin(
     googleAccount: GoogleAccount,
   ): Promise<UserEntity | null>;
-  addFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
 }
 
 @Injectable()
@@ -93,27 +90,6 @@ export class UserService implements IUserService {
         await this.userRepository.createUserWithGoogleLogin(googleAccount);
 
       return user;
-    } catch (error) {
-      throw handleError(this.logger, error);
-    }
-  }
-
-  async addFavorite(userId: string, tmdbId: string) {
-    try {
-      const favoriteList =
-        await this.userRepository.findOrCreateFavoriteList(userId);
-      const movieExists = await this.userRepository.checkMovieExists(
-        favoriteList.id,
-        tmdbId,
-      );
-
-      if (movieExists) {
-        throw new ConflictException(`Movie with id ${tmdbId} already exists`);
-      }
-
-      await this.userRepository.addMovieToList(favoriteList.id, tmdbId);
-
-      return new SuccessResponse('Movie added to favorite list');
     } catch (error) {
       throw handleError(this.logger, error);
     }
