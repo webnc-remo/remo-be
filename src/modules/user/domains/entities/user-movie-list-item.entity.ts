@@ -12,7 +12,7 @@ export class UserMovieListItemEntity {
   })
   list!: UserMovieListEntity;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   tmdb_id!: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

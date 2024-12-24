@@ -27,7 +27,7 @@ export class MoviesRepository {
       ],
     };
 
-    const items = await this.movieRepository.find({
+    const [movies, itemCount] = await this.movieRepository.findAndCount({
       where: filter,
       select: [
         'tmdb_id',
@@ -51,7 +51,46 @@ export class MoviesRepository {
       order: { [order]: 'DESC' },
     });
 
-    const itemCount = await this.movieRepository.count(filter);
+    const pageMetaDto = new PageMetaDto({
+      pageOptionsDto,
+      itemCount,
+    });
+
+    return {
+      items: movies,
+      meta: pageMetaDto,
+    };
+  }
+
+  async findByIds(ids: string[], pageOptionsDto: PageOptionsDto) {
+    const { order, take, skip } = pageOptionsDto;
+
+    // convert ids to number
+    const movieIds = ids.map((id) => Number.parseInt(id, 10));
+
+    const [movies, itemCount] = await this.movieRepository.findAndCount({
+      where: { tmdb_id: { $in: movieIds } },
+      select: [
+        'tmdb_id',
+        'title',
+        'original_title',
+        'poster_path',
+        'release_date',
+        'vote_average',
+        'vote_count',
+        'overview',
+        'popularity',
+        'adult',
+        'backdrop_path',
+        'original_language',
+        'video',
+        'tagline',
+        'genres',
+      ],
+      skip,
+      take,
+      order: { [order]: 'DESC' },
+    });
 
     const pageMetaDto = new PageMetaDto({
       pageOptionsDto,
@@ -59,7 +98,7 @@ export class MoviesRepository {
     });
 
     return {
-      items,
+      items: movies,
       meta: pageMetaDto,
     };
   }
