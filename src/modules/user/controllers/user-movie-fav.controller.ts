@@ -17,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 
 import { PageOptionsDto } from '../../../common/page-options.dto';
-import { AuthUser, PublicRoute } from '../../../decorators';
+import { AuthUser } from '../../../decorators';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { IUserFavMoviesService } from '../services/user-movie-fav.service';
@@ -104,20 +104,5 @@ export class UserFavMoviesController {
     @Param('tmdbId') tmdbId: string,
   ) {
     return this.userService.checkFavorite(userInfo.id, tmdbId);
-  }
-
-  @Get('/list/:listId')
-  @PublicRoute(true)
-  @ApiOperation({ summary: 'Get movies from list' })
-  @HttpCode(HttpStatus.OK)
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'List movies retrieved successfully',
-  })
-  getListMovies(
-    @Param('listId') listId: string,
-    @Query() pageOptionsDto: PageOptionsDto,
-  ) {
-    return this.userService.getListMovies(listId, pageOptionsDto);
   }
 }
