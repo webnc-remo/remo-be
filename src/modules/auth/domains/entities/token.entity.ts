@@ -8,7 +8,6 @@ export class RefreshTokenEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'uuid' })
   @ManyToOne(() => UserEntity, (user) => user.id)
   userId!: string;
 
