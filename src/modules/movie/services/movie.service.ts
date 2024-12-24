@@ -56,4 +56,14 @@ export class MoviesService {
       throw handleError(this.logger, error);
     }
   }
+
+  async getMovieById(id: number) {
+    try {
+      const movie = await this.moviesRepository.getMovieById(id);
+
+      return movie;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
 }

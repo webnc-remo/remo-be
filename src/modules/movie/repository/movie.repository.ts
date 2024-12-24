@@ -63,4 +63,17 @@ export class MoviesRepository {
       meta: pageMetaDto,
     };
   }
+
+  async getMovieById(id: number) {
+    const item = await this.movieRepository.findOne({
+      where: {
+        tmdb_id: id,
+      },
+      relations: {
+        genres: true,
+      },
+    });
+
+    return { item };
+  }
 }
