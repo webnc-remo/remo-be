@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -45,5 +46,25 @@ export class UserFavMoviesController {
     @Param('tmdbId') tmdbId: string,
   ) {
     return this.userService.addFavorite(userInfo.id, tmdbId);
+  }
+
+  @Delete('/:tmdbId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Remove movie from favorite list' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Movie removed from favorite list',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized access',
+  })
+  @ApiBearerAuth()
+  removeFavorite(
+    @AuthUser() userInfo: UserInfoDto,
+    @Param('tmdbId') tmdbId: string,
+  ) {
+    return this.userService.removeFavorite(userInfo.id, tmdbId);
   }
 }
