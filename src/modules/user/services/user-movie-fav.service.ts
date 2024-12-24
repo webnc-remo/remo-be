@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   Logger,
@@ -138,6 +139,16 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     meta: PageMetaDto;
   }> {
     try {
+      const list = await this.userFavMoviesRepository.getListById(listId);
+
+      if (!list) {
+        throw new NotFoundException('List not found');
+      }
+
+      if (!list.isPublic) {
+        throw new ForbiddenException('List is not public');
+      }
+
       const moviesInList =
         await this.userFavMoviesRepository.getMoviesFromList(listId);
 
