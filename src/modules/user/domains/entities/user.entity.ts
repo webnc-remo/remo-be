@@ -1,6 +1,8 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { RefreshTokenEntity } from '../../../auth/domains/entities/token.entity';
+import { RatingEntity } from './rating.entity';
+import { UserMovieListEntity } from './user-movie-list.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -29,4 +31,14 @@ export class UserEntity {
     cascade: true,
   })
   refreshTokensEntity!: RefreshTokenEntity[];
+
+  @OneToMany(() => UserMovieListEntity, (list) => list.user, {
+    cascade: true,
+  })
+  userMovieLists!: UserMovieListEntity[];
+
+  @OneToMany(() => RatingEntity, (rating) => rating.user, {
+    cascade: true,
+  })
+  ratings!: RatingEntity[];
 }
