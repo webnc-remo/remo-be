@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -15,6 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { AuthUser } from '../../../decorators';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
@@ -66,5 +68,21 @@ export class UserFavMoviesController {
     @Param('tmdbId') tmdbId: string,
   ) {
     return this.userService.removeFavorite(userInfo.id, tmdbId);
+  }
+
+  @Get('/')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get favorite list' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Favorite list retrieved successfully',
+  })
+  @ApiBearerAuth()
+  getFavoriteList(
+    @AuthUser() userInfo: UserInfoDto,
+    @Query() pageOptionsDto: PageOptionsDto,
+  ) {
+    return this.userService.getFavoriteList(userInfo.id, pageOptionsDto);
   }
 }

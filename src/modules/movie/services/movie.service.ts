@@ -66,4 +66,13 @@ export class MoviesService {
       throw handleError(this.logger, error);
     }
   }
+
+  async getMoviesByIds(movieIds: string[], pageOptionsDto: PageOptionsDto) {
+    const movies = await this.moviesRepository.findByIds(
+      movieIds,
+      pageOptionsDto,
+    );
+
+    return movies;
+  }
 }

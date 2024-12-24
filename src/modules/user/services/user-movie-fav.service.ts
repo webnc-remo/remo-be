@@ -6,13 +6,24 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { PageMetaDto } from '../../../common/page-meta.dto';
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { handleError } from '../../../common/utils';
+import { MovieEntity } from '../../movie/domains/schemas/movie.schema';
+import { MoviesService } from '../../movie/services/movie.service';
 import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
 import { UserFavMoviesRepository } from '../repository/user-movie-fav.repository';
 
 export interface IUserFavMoviesService {
   addFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
   removeFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
+  getFavoriteList(
+    userId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<{
+    items: MovieEntity[];
+    meta: PageMetaDto;
+  }>;
 }
 
 @Injectable()
@@ -22,6 +33,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
   constructor(
     @Inject('IUserFavMoviesRepository')
     private readonly userFavMoviesRepository: UserFavMoviesRepository,
+    private readonly moviesService: MoviesService,
   ) {
     this.logger = new Logger(UserFavMoviesService.name);
   }
@@ -74,5 +86,21 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     } catch (error) {
       throw handleError(this.logger, error);
     }
+  }
+
+  async getFavoriteList(userId: string, pageOptionsDto: PageOptionsDto) {
+    const favoriteList =
+      await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
+
+    const movieIds = await this.userFavMoviesRepository.getMovieIdsFromList(
+      favoriteList.id,
+    );
+
+    const movies = await this.moviesService.getMoviesByIds(
+      movieIds,
+      pageOptionsDto,
+    );
+
+    return movies;
   }
 }
