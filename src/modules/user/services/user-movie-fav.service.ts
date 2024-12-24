@@ -24,6 +24,10 @@ export interface IUserFavMoviesService {
     items: MovieEntity[];
     meta: PageMetaDto;
   }>;
+  checkFavorite(
+    userId: string,
+    tmdbId: string,
+  ): Promise<{ isFavorite: boolean }>;
 }
 
 @Injectable()
@@ -102,5 +106,20 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     );
 
     return movies;
+  }
+
+  async checkFavorite(userId: string, tmdbId: string) {
+    try {
+      const favoriteList =
+        await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
+      const movieExists = await this.userFavMoviesRepository.checkMovieExists(
+        favoriteList.id,
+        tmdbId,
+      );
+
+      return { isFavorite: Boolean(movieExists) };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
   }
 }
