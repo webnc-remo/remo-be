@@ -9,6 +9,8 @@ export interface IUserFavMoviesRepository {
   findOrCreateFavoriteList(userId: string): Promise<UserMovieListEntity>;
   checkMovieExists(listId: string, tmdbId: string);
   addMovieToList(listId: string, tmdbId: string);
+  removeMovieFromList(listId: string, tmdbId: string);
+  getMovieIdsFromList(listId: string): Promise<string[]>;
 }
 
 @Injectable()
@@ -49,5 +51,21 @@ export class UserFavMoviesRepository implements IUserFavMoviesRepository {
       tmdb_id: tmdbId,
       createdAt: new Date(),
     });
+  }
+
+  async removeMovieFromList(listId: string, tmdbId: string) {
+    await this.userMovieListItemRepository.delete({
+      list: { id: listId },
+      tmdb_id: tmdbId,
+    });
+  }
+
+  async getMovieIdsFromList(listId: string): Promise<string[]> {
+    const movieIds = await this.userMovieListItemRepository.find({
+      where: { list: { id: listId } },
+      select: ['tmdb_id'],
+    });
+
+    return movieIds.map((item) => item.tmdb_id);
   }
 }
