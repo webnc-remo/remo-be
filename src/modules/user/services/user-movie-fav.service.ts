@@ -12,7 +12,7 @@ import { handleError } from '../../../common/utils';
 import { MovieEntity } from '../../movie/domains/schemas/movie.schema';
 import { MoviesService } from '../../movie/services/movie.service';
 import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
-import { UserFavMoviesRepository } from '../repository/user-movie-fav.repository';
+import { UserFavMoviesRepository } from '../repository/user-movie.repository';
 
 export interface IUserFavMoviesService {
   addFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
