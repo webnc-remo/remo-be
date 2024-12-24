@@ -7,6 +7,7 @@ import { RefreshTokenEntity } from '../auth/domains/entities/token.entity';
 import { MoviesModule } from '../movie/movie.module';
 import { UserController } from './controllers/user.controller';
 import { UserFavMoviesController } from './controllers/user-movie-fav.controller';
+import { UserMovieListController } from './controllers/user-movie-list.controller';
 import { RatingEntity } from './domains/entities/rating.entity';
 import { UserEntity } from './domains/entities/user.entity';
 import { UserMovieListEntity } from './domains/entities/user-movie-list.entity';
@@ -35,7 +36,11 @@ import { UserFavMoviesService } from './services/user-movie-fav.service';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UserController, UserFavMoviesController],
+  controllers: [
+    UserController,
+    UserFavMoviesController,
+    UserMovieListController,
+  ],
   exports: [UserService, 'IUserService'],
   providers: [
     {
