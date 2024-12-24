@@ -4,7 +4,6 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  Param,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -49,25 +48,5 @@ export class UserController {
     );
 
     return user;
-  }
-
-  @Get('fav/:tmdbId')
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Add movie to favorite list' })
-  @HttpCode(HttpStatus.OK)
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Movie added to favorite list',
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized access',
-  })
-  @ApiBearerAuth()
-  async addFavorite(
-    @AuthUser() userInfo: UserInfoDto,
-    @Param('tmdbId') tmdbId: string,
-  ) {
-    return this.userService.addFavorite(userInfo.id, tmdbId);
   }
 }
