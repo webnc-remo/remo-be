@@ -12,6 +12,10 @@ import { PageOptionsDto } from '../../../common/page-options.dto';
 import { handleError } from '../../../common/utils';
 import { MovieEntity } from '../../movie/domains/schemas/movie.schema';
 import { MoviesService } from '../../movie/services/movie.service';
+import {
+  ListInfoDto,
+  ListMoviesResponseDto,
+} from '../domains/dtos/responses/list-movies-response.dto';
 import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
 import { UserFavMoviesRepository } from '../repository/user-movie.repository';
 
@@ -32,10 +36,7 @@ export interface IUserFavMoviesService {
   getListMovies(
     listId: string,
     pageOptionsDto: PageOptionsDto,
-  ): Promise<{
-    items: MovieEntity[];
-    meta: PageMetaDto;
-  }>;
+  ): Promise<ListMoviesResponseDto>;
 }
 
 @Injectable()
@@ -134,12 +135,17 @@ export class UserFavMoviesService implements IUserFavMoviesService {
   async getListMovies(
     listId: string,
     pageOptionsDto: PageOptionsDto,
-  ): Promise<{
-    items: MovieEntity[];
-    meta: PageMetaDto;
-  }> {
+  ): Promise<ListMoviesResponseDto> {
     try {
       const list = await this.userFavMoviesRepository.getListById(listId);
+      const listInfo: ListInfoDto = {
+        id: list?.id as string,
+        listName: list?.listName as string,
+        user: {
+          fullname: list?.user.fullName as string,
+          createdAt: list?.user.createdAt as Date,
+        },
+      };
 
       if (!list) {
         throw new NotFoundException('List not found');
@@ -159,7 +165,11 @@ export class UserFavMoviesService implements IUserFavMoviesService {
         pageOptionsDto,
       );
 
-      return movies;
+      return {
+        items: movies.items,
+        list: listInfo,
+        meta: movies.meta,
+      };
     } catch (error) {
       throw handleError(this.logger, error);
     }
