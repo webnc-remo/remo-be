@@ -74,6 +74,7 @@ export class UserFavMoviesRepository implements IUserFavMoviesRepository {
   async getListById(listId: string): Promise<UserMovieListEntity | null> {
     return this.userMovieListRepository.findOne({
       where: { id: listId },
+      relations: ['user'],
     });
   }
 
