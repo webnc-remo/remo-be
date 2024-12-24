@@ -12,7 +12,7 @@ import { handleError } from '../../../common/utils';
 import { MovieEntity } from '../../movie/domains/schemas/movie.schema';
 import { MoviesService } from '../../movie/services/movie.service';
 import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
-import { UserFavMoviesRepository } from '../repository/user-movie-fav.repository';
+import { UserFavMoviesRepository } from '../repository/user-movie.repository';
 
 export interface IUserFavMoviesService {
   addFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
@@ -28,6 +28,13 @@ export interface IUserFavMoviesService {
     userId: string,
     tmdbId: string,
   ): Promise<{ isFavorite: boolean }>;
+  getListMovies(
+    listId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<{
+    items: MovieEntity[];
+    meta: PageMetaDto;
+  }>;
 }
 
 @Injectable()
@@ -118,6 +125,30 @@ export class UserFavMoviesService implements IUserFavMoviesService {
       );
 
       return { isFavorite: Boolean(movieExists) };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async getListMovies(
+    listId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<{
+    items: MovieEntity[];
+    meta: PageMetaDto;
+  }> {
+    try {
+      const moviesInList =
+        await this.userFavMoviesRepository.getMoviesFromList(listId);
+
+      const movieIds = moviesInList.map((movie) => movie.tmdb_id);
+
+      const movies = await this.moviesService.getMoviesByIds(
+        movieIds,
+        pageOptionsDto,
+      );
+
+      return movies;
     } catch (error) {
       throw handleError(this.logger, error);
     }

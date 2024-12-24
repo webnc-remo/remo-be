@@ -12,7 +12,7 @@ import { UserEntity } from './domains/entities/user.entity';
 import { UserMovieListEntity } from './domains/entities/user-movie-list.entity';
 import { UserMovieListItemEntity } from './domains/entities/user-movie-list-item.entity';
 import { UserRepository } from './repository/user.repository';
-import { UserFavMoviesRepository } from './repository/user-movie-fav.repository';
+import { UserFavMoviesRepository } from './repository/user-movie.repository';
 import { UserService } from './services/user.service';
 import { UserFavMoviesService } from './services/user-movie-fav.service';
 
