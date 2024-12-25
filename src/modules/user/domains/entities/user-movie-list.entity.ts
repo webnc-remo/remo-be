@@ -24,7 +24,7 @@ export class UserMovieListEntity {
   imageUrl!: string | null;
 
   @Column({ type: 'varchar', default: 'custom' })
-  listType!: 'custom' | 'favorite' | 'wishlist';
+  listType!: 'custom' | 'favorite' | 'watchlist';
 
   @Column({ type: 'boolean', default: true })
   isPublic!: boolean;
