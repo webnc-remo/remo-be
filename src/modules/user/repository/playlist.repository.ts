@@ -41,10 +41,7 @@ export class PlaylistRepository {
     });
   }
 
-  async findPlaylistWithItems(
-    playlistId: string,
-    userId: string,
-  ): Promise<UserMovieListEntity | null> {
+  async findPlaylistWithItems(playlistId: string, userId: string) {
     return this.playlistRepository.findOne({
       where: {
         id: playlistId,

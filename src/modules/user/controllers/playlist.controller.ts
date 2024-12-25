@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -17,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { AuthUser } from '../../../decorators';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { AddMovieToPlaylistDto } from '../domains/dtos/add-movie-to-playlist.dto';
@@ -123,8 +125,13 @@ export class PlaylistController {
   async getPlaylistDetails(
     @AuthUser() userInfo: UserInfoDto,
     @Param('playlistId') playlistId: string,
+    @Query() pageOptionsDto: PageOptionsDto,
   ) {
-    return this.playlistService.getPlaylistDetails(userInfo.id, playlistId);
+    return this.playlistService.getPlaylistDetails(
+      userInfo,
+      playlistId,
+      pageOptionsDto,
+    );
   }
 
   @Get()

@@ -4,13 +4,21 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
+import { MoviesService } from '../../movie/services/movie.service';
 import { UpdatePlaylistDto } from '../domains/dtos/update-playlist.dto';
+import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { UserMovieListEntity } from '../domains/entities/user-movie-list.entity';
 import { PlaylistRepository } from '../repository/playlist.repository';
+import { UserFavMoviesRepository } from '../repository/user-movie-fav.repository';
 
 @Injectable()
 export class PlaylistService {
-  constructor(private readonly playlistRepository: PlaylistRepository) {}
+  constructor(
+    private readonly playlistRepository: PlaylistRepository,
+    private readonly moviesService: MoviesService,
+    private readonly userFavMoviesRepository: UserFavMoviesRepository,
+  ) {}
 
   async createPlaylist(
     userId: string,
@@ -78,19 +86,40 @@ export class PlaylistService {
   }
 
   async getPlaylistDetails(
-    userId: string,
+    userInfo: UserInfoDto,
     playlistId: string,
-  ): Promise<UserMovieListEntity> {
+    pageOptionsDto: PageOptionsDto,
+  ) {
     const playlist = await this.playlistRepository.findPlaylistWithItems(
       playlistId,
-      userId,
+      userInfo.id,
     );
 
     if (!playlist) {
       throw new NotFoundException('Playlist not found');
     }
 
-    return playlist;
+    const movieIds = await this.userFavMoviesRepository.getMovieIdsFromList(
+      playlist.id,
+    );
+
+    const movies = await this.moviesService.getMoviesByIds(
+      movieIds,
+      pageOptionsDto,
+    );
+
+    return {
+      items: movies.items,
+      list: {
+        id: playlist.id,
+        listName: playlist.listName,
+        createdAt: playlist.createdAt,
+        user: {
+          fullname: userInfo.fullName as string,
+        },
+      },
+      meta: movies.meta,
+    };
   }
 
   async getUserPlaylists(userId: string): Promise<UserMovieListEntity[]> {
