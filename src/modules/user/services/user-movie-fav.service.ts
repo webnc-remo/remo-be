@@ -7,10 +7,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PageMetaDto } from '../../../common/page-meta.dto';
 import { PageOptionsDto } from '../../../common/page-options.dto';
 import { handleError } from '../../../common/utils';
-import { MovieEntity } from '../../movie/domains/schemas/movie.schema';
 import { MoviesService } from '../../movie/services/movie.service';
 import {
   ListInfoDto,
@@ -25,10 +23,7 @@ export interface IUserFavMoviesService {
   getFavoriteList(
     userId: string,
     pageOptionsDto: PageOptionsDto,
-  ): Promise<{
-    items: MovieEntity[];
-    meta: PageMetaDto;
-  }>;
+  ): Promise<ListMoviesResponseDto>;
   checkFavorite(
     userId: string,
     tmdbId: string,
@@ -101,7 +96,10 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     }
   }
 
-  async getFavoriteList(userId: string, pageOptionsDto: PageOptionsDto) {
+  async getFavoriteList(
+    userId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<ListMoviesResponseDto> {
     const favoriteList =
       await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
 
@@ -114,7 +112,18 @@ export class UserFavMoviesService implements IUserFavMoviesService {
       pageOptionsDto,
     );
 
-    return movies;
+    return {
+      items: movies.items,
+      list: {
+        id: favoriteList.id,
+        listName: favoriteList.listName,
+        createdAt: favoriteList.createdAt,
+        user: {
+          fullname: favoriteList.user.fullName as string,
+        },
+      },
+      meta: movies.meta,
+    };
   }
 
   async checkFavorite(userId: string, tmdbId: string) {
@@ -141,9 +150,9 @@ export class UserFavMoviesService implements IUserFavMoviesService {
       const listInfo: ListInfoDto = {
         id: list?.id as string,
         listName: list?.listName as string,
+        createdAt: list?.createdAt as Date,
         user: {
           fullname: list?.user.fullName as string,
-          createdAt: list?.user.createdAt as Date,
         },
       };
 

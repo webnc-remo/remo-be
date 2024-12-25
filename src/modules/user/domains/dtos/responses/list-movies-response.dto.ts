@@ -6,9 +6,6 @@ import { MovieEntity } from '../../../../movie/domains/schemas/movie.schema';
 export class ListUserInfoDto {
   @ApiProperty()
   fullname!: string;
-
-  @ApiProperty()
-  createdAt!: Date;
 }
 
 export class ListInfoDto {
@@ -17,6 +14,9 @@ export class ListInfoDto {
 
   @ApiProperty()
   listName!: string;
+
+  @ApiProperty()
+  createdAt!: Date;
 
   @ApiProperty({ type: ListUserInfoDto })
   user!: ListUserInfoDto;
