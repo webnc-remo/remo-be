@@ -16,19 +16,19 @@ import {
 } from '../domains/dtos/responses/list-movies-response.dto';
 import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
-import { UserFavMoviesRepository } from '../repository/user-movie-fav.repository';
+import { UserWatchlistRepository } from '../repository/user-movie-watchlist.repository';
 
-export interface IUserFavMoviesService {
-  addFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
-  removeFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
-  getFavoriteList(
+export interface IUserWatchlistService {
+  addWatchlist(userId: string, tmdbId: string): Promise<SuccessResponse>;
+  removeWatchlist(userId: string, tmdbId: string): Promise<SuccessResponse>;
+  getWatchlist(
     userInfo: UserInfoDto,
     pageOptionsDto: PageOptionsDto,
   ): Promise<ListMoviesResponseDto>;
-  checkFavorite(
+  checkWatchlist(
     userId: string,
     tmdbId: string,
-  ): Promise<{ isFavorite: boolean }>;
+  ): Promise<{ isWatchlist: boolean }>;
   getListMovies(
     listId: string,
     pageOptionsDto: PageOptionsDto,
@@ -36,23 +36,23 @@ export interface IUserFavMoviesService {
 }
 
 @Injectable()
-export class UserFavMoviesService implements IUserFavMoviesService {
+export class UserWatchlistService implements IUserWatchlistService {
   public logger: Logger;
 
   constructor(
-    @Inject('IUserFavMoviesRepository')
-    private readonly userFavMoviesRepository: UserFavMoviesRepository,
+    @Inject('IUserWatchlistRepository')
+    private readonly userWatchlistRepository: UserWatchlistRepository,
     private readonly moviesService: MoviesService,
   ) {
-    this.logger = new Logger(UserFavMoviesService.name);
+    this.logger = new Logger(UserWatchlistService.name);
   }
 
-  async addFavorite(userId: string, tmdbId: string) {
+  async addWatchlist(userId: string, tmdbId: string) {
     try {
-      const favoriteList =
-        await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
-      const movieExists = await this.userFavMoviesRepository.checkMovieExists(
-        favoriteList.id,
+      const watchlist =
+        await this.userWatchlistRepository.findOrCreateWatchlist(userId);
+      const movieExists = await this.userWatchlistRepository.checkMovieExists(
+        watchlist.id,
         tmdbId,
       );
 
@@ -60,10 +60,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
         throw new ConflictException(`Movie with id ${tmdbId} already exists`);
       }
 
-      await this.userFavMoviesRepository.addMovieToList(
-        favoriteList.id,
-        tmdbId,
-      );
+      await this.userWatchlistRepository.addMovieToList(watchlist.id, tmdbId);
 
       return new SuccessResponse('Movie added to favorite list');
     } catch (error) {
@@ -71,12 +68,12 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     }
   }
 
-  async removeFavorite(userId: string, tmdbId: string) {
+  async removeWatchlist(userId: string, tmdbId: string) {
     try {
-      const favoriteList =
-        await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
-      const movieExists = await this.userFavMoviesRepository.checkMovieExists(
-        favoriteList.id,
+      const watchlist =
+        await this.userWatchlistRepository.findOrCreateWatchlist(userId);
+      const movieExists = await this.userWatchlistRepository.checkMovieExists(
+        watchlist.id,
         tmdbId,
       );
 
@@ -86,8 +83,8 @@ export class UserFavMoviesService implements IUserFavMoviesService {
         );
       }
 
-      await this.userFavMoviesRepository.removeMovieFromList(
-        favoriteList.id,
+      await this.userWatchlistRepository.removeMovieFromList(
+        watchlist.id,
         tmdbId,
       );
 
@@ -97,14 +94,15 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     }
   }
 
-  async getFavoriteList(
+  async getWatchlist(
     userInfo: UserInfoDto,
     pageOptionsDto: PageOptionsDto,
   ): Promise<ListMoviesResponseDto> {
-    const favoriteList =
-      await this.userFavMoviesRepository.findOrCreateFavoriteList(userInfo.id);
-    const movieIds = await this.userFavMoviesRepository.getMovieIdsFromList(
-      favoriteList.id,
+    const watchlist = await this.userWatchlistRepository.findOrCreateWatchlist(
+      userInfo.id,
+    );
+    const movieIds = await this.userWatchlistRepository.getMovieIdsFromList(
+      watchlist.id,
     );
 
     const movies = await this.moviesService.getMoviesByIds(
@@ -115,9 +113,9 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     return {
       items: movies.items,
       list: {
-        id: favoriteList.id,
-        listName: favoriteList.listName,
-        createdAt: favoriteList.createdAt,
+        id: watchlist.id,
+        listName: watchlist.listName,
+        createdAt: watchlist.createdAt,
         user: {
           fullname: userInfo.fullName as string,
         },
@@ -126,16 +124,16 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     };
   }
 
-  async checkFavorite(userId: string, tmdbId: string) {
+  async checkWatchlist(userId: string, tmdbId: string) {
     try {
-      const favoriteList =
-        await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
-      const movieExists = await this.userFavMoviesRepository.checkMovieExists(
-        favoriteList.id,
+      const watchlist =
+        await this.userWatchlistRepository.findOrCreateWatchlist(userId);
+      const movieExists = await this.userWatchlistRepository.checkMovieExists(
+        watchlist.id,
         tmdbId,
       );
 
-      return { isFavorite: Boolean(movieExists) };
+      return { isWatchlist: Boolean(movieExists) };
     } catch (error) {
       throw handleError(this.logger, error);
     }
@@ -146,7 +144,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
     pageOptionsDto: PageOptionsDto,
   ): Promise<ListMoviesResponseDto> {
     try {
-      const list = await this.userFavMoviesRepository.getListById(listId);
+      const list = await this.userWatchlistRepository.getListById(listId);
       const listInfo: ListInfoDto = {
         id: list?.id as string,
         listName: list?.listName as string,
@@ -165,7 +163,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
       }
 
       const moviesInList =
-        await this.userFavMoviesRepository.getMoviesFromList(listId);
+        await this.userWatchlistRepository.getMoviesFromList(listId);
 
       const movieIds = moviesInList.map((movie) => movie.tmdb_id);
 

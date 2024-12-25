@@ -8,14 +8,17 @@ import { MoviesModule } from '../movie/movie.module';
 import { UserController } from './controllers/user.controller';
 import { UserFavMoviesController } from './controllers/user-movie-fav.controller';
 import { UserMovieListController } from './controllers/user-movie-list.controller';
+import { UserWatchlistController } from './controllers/user-movie-watchlist.controller';
 import { RatingEntity } from './domains/entities/rating.entity';
 import { UserEntity } from './domains/entities/user.entity';
 import { UserMovieListEntity } from './domains/entities/user-movie-list.entity';
 import { UserMovieListItemEntity } from './domains/entities/user-movie-list-item.entity';
 import { UserRepository } from './repository/user.repository';
-import { UserFavMoviesRepository } from './repository/user-movie.repository';
+import { UserFavMoviesRepository } from './repository/user-movie-fav.repository';
+import { UserWatchlistRepository } from './repository/user-movie-watchlist.repository';
 import { UserService } from './services/user.service';
 import { UserFavMoviesService } from './services/user-movie-fav.service';
+import { UserWatchlistService } from './services/user-movie-watchlist.service';
 
 @Module({
   imports: [
@@ -40,6 +43,7 @@ import { UserFavMoviesService } from './services/user-movie-fav.service';
     UserController,
     UserFavMoviesController,
     UserMovieListController,
+    UserWatchlistController,
   ],
   exports: [UserService, 'IUserService'],
   providers: [
@@ -52,15 +56,24 @@ import { UserFavMoviesService } from './services/user-movie-fav.service';
       provide: 'IUserRepository',
       useClass: UserRepository,
     },
-    {
-      provide: 'IUserFavMoviesService',
-      useClass: UserFavMoviesService,
-    },
-    UserFavMoviesService,
     UserFavMoviesRepository,
     {
       provide: 'IUserFavMoviesRepository',
       useClass: UserFavMoviesRepository,
+    },
+    {
+      provide: 'IUserWatchlistRepository',
+      useClass: UserWatchlistRepository,
+    },
+    UserWatchlistService,
+    UserFavMoviesService,
+    {
+      provide: 'IUserFavMoviesService',
+      useClass: UserFavMoviesService,
+    },
+    {
+      provide: 'IUserWatchlistService',
+      useClass: UserWatchlistService,
     },
   ],
 })

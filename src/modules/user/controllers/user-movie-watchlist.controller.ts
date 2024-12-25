@@ -21,89 +21,89 @@ import { PageOptionsDto } from '../../../common/page-options.dto';
 import { AuthUser } from '../../../decorators';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
-import { IUserFavMoviesService } from '../services/user-movie-fav.service';
+import { IUserWatchlistService } from '../services/user-movie-watchlist.service';
 
-@Controller('/v1/user/fav')
+@Controller('/v1/user/watchlist')
 @ApiTags('user')
-export class UserFavMoviesController {
+export class UserWatchlistController {
   constructor(
-    @Inject('IUserFavMoviesService')
-    private readonly userFavService: IUserFavMoviesService,
+    @Inject('IUserWatchlistService')
+    private readonly userService: IUserWatchlistService,
   ) {}
 
   @Post('/:tmdbId')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Add movie to favorite list' })
+  @ApiOperation({ summary: 'Add movie to watchlist' })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Movie added to favorite list',
+    description: 'Movie added to watchlist',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
   @ApiBearerAuth()
-  addFavorite(
+  addWatchlist(
     @AuthUser() userInfo: UserInfoDto,
     @Param('tmdbId') tmdbId: string,
   ) {
-    return this.userFavService.addFavorite(userInfo.id, tmdbId);
+    return this.userService.addWatchlist(userInfo.id, tmdbId);
   }
 
   @Delete('/:tmdbId')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Remove movie from favorite list' })
+  @ApiOperation({ summary: 'Remove movie from watchlist' })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Movie removed from favorite list',
+    description: 'Movie removed from watchlist',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
   @ApiBearerAuth()
-  removeFavorite(
+  removeWatchlist(
     @AuthUser() userInfo: UserInfoDto,
     @Param('tmdbId') tmdbId: string,
   ) {
-    return this.userFavService.removeFavorite(userInfo.id, tmdbId);
+    return this.userService.removeWatchlist(userInfo.id, tmdbId);
   }
 
   @Get('/')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Get favorite list' })
+  @ApiOperation({ summary: 'Get watchlist' })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Favorite list retrieved successfully',
+    description: 'Watchlist retrieved successfully',
   })
   @ApiBearerAuth()
-  getFavoriteList(
+  getWatchlist(
     @AuthUser() userInfo: UserInfoDto,
     @Query() pageOptionsDto: PageOptionsDto,
   ) {
-    return this.userFavService.getFavoriteList(userInfo, pageOptionsDto);
+    return this.userService.getWatchlist(userInfo, pageOptionsDto);
   }
 
   @Get('/check/:tmdbId')
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Check if movie is in favorite list' })
+  @ApiOperation({ summary: 'Check if movie is in watchlist' })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Returns whether movie is in favorites',
+    description: 'Returns whether movie is in watchlist',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized access',
   })
   @ApiBearerAuth()
-  async checkFavorite(
+  async checkWatchlist(
     @AuthUser() userInfo: UserInfoDto,
     @Param('tmdbId') tmdbId: string,
   ) {
-    return this.userFavService.checkFavorite(userInfo.id, tmdbId);
+    return this.userService.checkWatchlist(userInfo.id, tmdbId);
   }
 }
