@@ -100,4 +100,17 @@ export class PlaylistRepository {
       },
     });
   }
+
+  async findPlaylistsByMovieId(
+    userId: string,
+    tmdbId: string,
+  ): Promise<UserMovieListEntity[]> {
+    return this.playlistRepository
+      .createQueryBuilder('playlist')
+      .innerJoinAndSelect('playlist.items', 'items')
+      .where('playlist.user.id = :userId', { userId })
+      .andWhere('items.tmdb_id = :tmdbId', { tmdbId })
+      .andWhere('playlist.listType = :listType', { listType: 'custom' })
+      .getMany();
+  }
 }

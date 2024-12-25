@@ -96,4 +96,23 @@ export class PlaylistService {
   async getUserPlaylists(userId: string): Promise<UserMovieListEntity[]> {
     return this.playlistRepository.getUserPlaylists(userId);
   }
+
+  async getPlaylistsByMovieId(userId: string, tmdbId: string) {
+    const playlists = await this.playlistRepository.findPlaylistsByMovieId(
+      userId,
+      tmdbId,
+    );
+
+    return {
+      playlists: playlists.map((playlist) => ({
+        id: playlist.id,
+        listName: playlist.listName,
+        description: playlist.description,
+        imageUrl: playlist.imageUrl,
+        listType: playlist.listType,
+        isPublic: playlist.isPublic,
+        createdAt: playlist.createdAt,
+      })),
+    };
+  }
 }

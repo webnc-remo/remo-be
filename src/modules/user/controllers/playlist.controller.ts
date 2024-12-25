@@ -139,4 +139,40 @@ export class PlaylistController {
   async getUserPlaylists(@AuthUser() userInfo: UserInfoDto) {
     return this.playlistService.getUserPlaylists(userInfo.id);
   }
+
+  @Get('movies/:tmdbId/playlists')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get playlists containing specific movie' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully retrieved playlists containing the movie',
+    schema: {
+      type: 'object',
+      properties: {
+        playlists: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              listName: { type: 'string' },
+              description: { type: 'string', nullable: true },
+              imageUrl: { type: 'string', nullable: true },
+              listType: { type: 'string' },
+              isPublic: { type: 'boolean' },
+              createdAt: { type: 'string', format: 'date-time' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiBearerAuth()
+  async getPlaylistsByMovieId(
+    @AuthUser() userInfo: UserInfoDto,
+    @Param('tmdbId') tmdbId: string,
+  ) {
+    return this.playlistService.getPlaylistsByMovieId(userInfo.id, tmdbId);
+  }
 }
