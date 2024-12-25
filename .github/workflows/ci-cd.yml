@@ -10,6 +10,7 @@ jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'develop')
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
