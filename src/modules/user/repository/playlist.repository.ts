@@ -113,4 +113,11 @@ export class PlaylistRepository {
       .andWhere('playlist.listType = :listType', { listType: 'custom' })
       .getMany();
   }
+
+  async deletePlaylistItem(playlistId: string, tmdbId: string): Promise<void> {
+    await this.playlistItemRepository.delete({
+      list: { id: playlistId },
+      tmdb_id: tmdbId,
+    });
+  }
 }

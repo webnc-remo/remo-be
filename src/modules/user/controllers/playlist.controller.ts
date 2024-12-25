@@ -175,4 +175,25 @@ export class PlaylistController {
   ) {
     return this.playlistService.getPlaylistsByMovieId(userInfo.id, tmdbId);
   }
+
+  @Delete(':playlistId/movies/:tmdbId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Remove movie from playlist' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Movie removed from playlist successfully',
+  })
+  @ApiBearerAuth()
+  async removeMovieFromPlaylist(
+    @AuthUser() userInfo: UserInfoDto,
+    @Param('playlistId') playlistId: string,
+    @Param('tmdbId') tmdbId: string,
+  ) {
+    await this.playlistService.removeMovieFromPlaylist(
+      userInfo.id,
+      playlistId,
+      tmdbId,
+    );
+  }
 }

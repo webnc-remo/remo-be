@@ -115,4 +115,30 @@ export class PlaylistService {
       })),
     };
   }
+
+  async removeMovieFromPlaylist(
+    userId: string,
+    playlistId: string,
+    tmdbId: string,
+  ): Promise<void> {
+    const playlist = await this.playlistRepository.findPlaylistById(
+      playlistId,
+      userId,
+    );
+
+    if (!playlist) {
+      throw new NotFoundException('Playlist not found');
+    }
+
+    const movieInPlaylist = await this.playlistRepository.findMovieInPlaylist(
+      playlistId,
+      tmdbId,
+    );
+
+    if (!movieInPlaylist) {
+      throw new NotFoundException('Movie not found in playlist');
+    }
+
+    await this.playlistRepository.deletePlaylistItem(playlistId, tmdbId);
+  }
 }
