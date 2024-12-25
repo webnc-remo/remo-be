@@ -15,13 +15,14 @@ import {
   ListMoviesResponseDto,
 } from '../domains/dtos/responses/list-movies-response.dto';
 import { SuccessResponse } from '../domains/dtos/responses/success-response.dto';
+import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { UserFavMoviesRepository } from '../repository/user-movie.repository';
 
 export interface IUserFavMoviesService {
   addFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
   removeFavorite(userId: string, tmdbId: string): Promise<SuccessResponse>;
   getFavoriteList(
-    userId: string,
+    userInfo: UserInfoDto,
     pageOptionsDto: PageOptionsDto,
   ): Promise<ListMoviesResponseDto>;
   checkFavorite(
@@ -97,12 +98,11 @@ export class UserFavMoviesService implements IUserFavMoviesService {
   }
 
   async getFavoriteList(
-    userId: string,
+    userInfo: UserInfoDto,
     pageOptionsDto: PageOptionsDto,
   ): Promise<ListMoviesResponseDto> {
     const favoriteList =
-      await this.userFavMoviesRepository.findOrCreateFavoriteList(userId);
-
+      await this.userFavMoviesRepository.findOrCreateFavoriteList(userInfo.id);
     const movieIds = await this.userFavMoviesRepository.getMovieIdsFromList(
       favoriteList.id,
     );
@@ -119,7 +119,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
         listName: favoriteList.listName,
         createdAt: favoriteList.createdAt,
         user: {
-          fullname: favoriteList.user.fullName as string,
+          fullname: userInfo.fullName as string,
         },
       },
       meta: movies.meta,

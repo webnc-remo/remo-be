@@ -83,7 +83,7 @@ export class UserFavMoviesController {
     @AuthUser() userInfo: UserInfoDto,
     @Query() pageOptionsDto: PageOptionsDto,
   ) {
-    return this.userService.getFavoriteList(userInfo.id, pageOptionsDto);
+    return this.userService.getFavoriteList(userInfo, pageOptionsDto);
   }
 
   @Get('/check/:tmdbId')
