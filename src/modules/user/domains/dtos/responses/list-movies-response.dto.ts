@@ -5,7 +5,7 @@ import { MovieEntity } from '../../../../movie/domains/schemas/movie.schema';
 
 export class ListUserInfoDto {
   @ApiProperty()
-  fullname!: string;
+  fullname?: string;
 }
 
 export class ListInfoDto {
@@ -13,13 +13,13 @@ export class ListInfoDto {
   id!: string;
 
   @ApiProperty()
-  listName!: string;
+  listName?: string;
 
   @ApiProperty()
-  createdAt!: Date;
+  createdAt?: Date;
 
   @ApiProperty({ type: ListUserInfoDto })
-  user!: ListUserInfoDto;
+  user?: ListUserInfoDto;
 }
 
 export class ListMoviesResponseDto {
