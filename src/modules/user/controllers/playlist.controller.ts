@@ -24,7 +24,7 @@ import { UpdatePlaylistDto } from '../domains/dtos/update-playlist.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { PlaylistService } from '../services/playlist.service';
 
-@Controller('playlists')
+@Controller('/v1/user/playlists')
 @ApiTags('user-playlists')
 export class PlaylistController {
   constructor(private readonly playlistService: PlaylistService) {}
