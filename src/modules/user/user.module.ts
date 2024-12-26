@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RefreshTokenEntity } from '../auth/domains/entities/token.entity';
 import { MoviesModule } from '../movie/movie.module';
 import { PlaylistController } from './controllers/playlist.controller';
+import { RatingController } from './controllers/rating.controller';
 import { UserController } from './controllers/user.controller';
 import { UserFavMoviesController } from './controllers/user-movie-fav.controller';
 import { UserMovieListController } from './controllers/user-movie-list.controller';
@@ -15,10 +16,12 @@ import { UserEntity } from './domains/entities/user.entity';
 import { UserMovieListEntity } from './domains/entities/user-movie-list.entity';
 import { UserMovieListItemEntity } from './domains/entities/user-movie-list-item.entity';
 import { PlaylistRepository } from './repository/playlist.repository';
+import { RatingRepository } from './repository/rating.repository';
 import { UserRepository } from './repository/user.repository';
 import { UserFavMoviesRepository } from './repository/user-movie-fav.repository';
 import { UserWatchlistRepository } from './repository/user-movie-watchlist.repository';
 import { PlaylistService } from './services/playlist.service';
+import { RatingService } from './services/rating.service';
 import { UserService } from './services/user.service';
 import { UserFavMoviesService } from './services/user-movie-fav.service';
 import { UserWatchlistService } from './services/user-movie-watchlist.service';
@@ -48,6 +51,7 @@ import { UserWatchlistService } from './services/user-movie-watchlist.service';
     UserMovieListController,
     UserWatchlistController,
     PlaylistController,
+    RatingController,
   ],
   exports: [UserService, 'IUserService'],
   providers: [
@@ -81,6 +85,8 @@ import { UserWatchlistService } from './services/user-movie-watchlist.service';
     },
     PlaylistService,
     PlaylistRepository,
+    RatingService,
+    RatingRepository,
   ],
 })
 export class UserModule {}
