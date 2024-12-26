@@ -12,8 +12,8 @@ export class RatingEntity {
   })
   user!: UserEntity;
 
-  @Column({ type: 'varchar' })
-  rating!: string;
+  @Column({ type: 'integer' })
+  rating!: number;
 
   @Column({ type: 'varchar', nullable: true })
   review!: string | null;
