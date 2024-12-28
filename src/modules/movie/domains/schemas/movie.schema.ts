@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { Column, Entity, JoinTable, ManyToMany, ObjectIdColumn } from 'typeorm';
+import { Column, Entity, ObjectIdColumn } from 'typeorm';
 
 import { GenreEntity } from './movie-genre.schema';
 
@@ -156,8 +156,7 @@ export class MovieEntity {
   @Column('simple-array')
   categories!: string[];
 
-  @ManyToMany(() => GenreEntity, (genre) => genre.movies)
-  @JoinTable()
+  @Column()
   genres!: GenreEntity[];
 
   @Column()

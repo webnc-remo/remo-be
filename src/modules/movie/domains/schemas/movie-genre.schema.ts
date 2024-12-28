@@ -1,14 +1,12 @@
-import { Column, Entity, ManyToMany, ObjectId, ObjectIdColumn } from 'typeorm';
-
-import { MovieEntity } from './movie.schema';
+import { Column, Entity, ObjectId, ObjectIdColumn } from 'typeorm';
 
 @Entity('movie_genres')
 export class GenreEntity {
-  @ObjectIdColumn() id?: ObjectId;
+  @ObjectIdColumn() _id?: ObjectId;
+
+  @Column()
+  id!: number;
 
   @Column()
   name!: string;
-
-  @ManyToMany(() => MovieEntity, (movie) => movie.genres)
-  movies!: MovieEntity[];
 }
