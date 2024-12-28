@@ -4,6 +4,7 @@ import { PageOptionsDto } from '../../../common/page-options.dto';
 import { handleError } from '../../../common/utils';
 import { MovieTrendingDayEntity } from '../domains/schemas/movie-trending-day.schema';
 import { MoviesRepository } from '../repository/movie.repository';
+import { MovieGenresRepository } from '../repository/movie-genres.repository';
 import { MovieTrendingDayRepository } from '../repository/movie-trending-day.repository';
 import { MovieTrendingWeekRepository } from '../repository/movie-trending-week.repository';
 
@@ -15,6 +16,7 @@ export class MoviesService {
     private readonly moviesRepository: MoviesRepository,
     private readonly movieTrendingDayRepository: MovieTrendingDayRepository,
     private readonly movieTrendingWeekRepository: MovieTrendingWeekRepository,
+    private readonly movieGenresRepository: MovieGenresRepository,
   ) {
     this.logger = new Logger(MoviesService.name);
   }
@@ -74,5 +76,15 @@ export class MoviesService {
     );
 
     return movies;
+  }
+
+  async getGenres() {
+    try {
+      const genres = await this.movieGenresRepository.getAll();
+
+      return genres;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
   }
 }

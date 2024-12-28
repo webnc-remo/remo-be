@@ -32,4 +32,10 @@ export class PageOptionsDto {
 
   @StringFieldOptional()
   readonly q?: string;
+
+  @StringFieldOptional()
+  readonly year?: string;
+
+  @StringFieldOptional()
+  readonly genre?: string;
 }

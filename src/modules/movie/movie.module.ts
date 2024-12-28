@@ -7,6 +7,7 @@ import { GenreEntity } from './domains/schemas/movie-genre.schema';
 import { MovieTrendingDayEntity } from './domains/schemas/movie-trending-day.schema';
 import { MovieTrendingWeekEntity } from './domains/schemas/movie-trending-week.schema';
 import { MoviesRepository } from './repository/movie.repository';
+import { MovieGenresRepository } from './repository/movie-genres.repository';
 import { MovieTrendingDayRepository } from './repository/movie-trending-day.repository';
 import { MovieTrendingWeekRepository } from './repository/movie-trending-week.repository';
 import { MoviesService } from './services/movie.service';
@@ -24,6 +25,7 @@ import { MoviesService } from './services/movie.service';
     MoviesRepository,
     MovieTrendingDayRepository,
     MovieTrendingWeekRepository,
+    MovieGenresRepository,
   ],
   exports: [MoviesService],
 })
