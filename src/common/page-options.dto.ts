@@ -38,4 +38,7 @@ export class PageOptionsDto {
 
   @StringFieldOptional()
   readonly genre?: string;
+
+  @StringFieldOptional()
+  readonly rating?: string;
 }

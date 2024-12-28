@@ -58,6 +58,24 @@ export class MoviesController {
     return { results: movies };
   }
 
+  @Get('/genres')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Get all genres' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Genres retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Genres not found',
+  })
+  async getGenres() {
+    const genres = await this.moviesService.getGenres();
+
+    return genres;
+  }
+
   @Get('/:id')
   @PublicRoute(true)
   @ApiOperation({ summary: 'Get movie by id' })
@@ -75,23 +93,5 @@ export class MoviesController {
     const movie = await this.moviesService.getMovieById(numberId);
 
     return movie;
-  }
-
-  @Get('/genres')
-  @PublicRoute(true)
-  @ApiOperation({ summary: 'Get all genres' })
-  @HttpCode(HttpStatus.ACCEPTED)
-  @ApiResponse({
-    status: HttpStatus.ACCEPTED,
-    description: 'Genres retrieved successfully',
-  })
-  @ApiNotFoundResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Genres not found',
-  })
-  async getGenres() {
-    const genres = await this.moviesService.getGenres();
-
-    return genres;
   }
 }

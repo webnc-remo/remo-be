@@ -15,7 +15,7 @@ export class MoviesRepository {
   ) {}
 
   async search(pageOptionsDto: PageOptionsDto) {
-    const { order, take, skip, q, genre, year } = pageOptionsDto;
+    const { order, take, skip, q, genre, year, rating } = pageOptionsDto;
     const filter: FilterQuery<any> = { $and: [] }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     if (genre && genre.length > 0) {
@@ -24,6 +24,11 @@ export class MoviesRepository {
 
     if (year && year.length > 0) {
       filter.$and?.push({ release_date: { $gte: `${year}-01-01` } });
+    }
+
+    if (rating) {
+      const floatRating = Number.parseFloat(rating) / 10;
+      filter.$and?.push({ vote_average: { $gte: floatRating } });
     }
 
     filter.$and?.push({
