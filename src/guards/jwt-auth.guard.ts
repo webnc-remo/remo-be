@@ -41,37 +41,27 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     err,
     user,
     _info,
-    _context: ExecutionContext,
+    context: ExecutionContext,
   ): UserInfoDto {
     if (err || !user) {
       throw err || new UnauthorizedException('Access Token is Invalid');
     }
 
+    const request = context.switchToHttp().getRequest<Request>();
+    const path = request.path;
+
+    const isVerifyEmailPath = path === '/v1/auth/verify-email';
+    const isLogoutPath = path === '/v1/auth/logout';
+
+    // Allow unverified users to access verify-email endpoint
+    // Allow both verified and unverified users to logout
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    // except for /v1/auth/verify-email, v1/auth/logout
-    if (
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      (!user.isVerified &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        !_context
-          .switchToHttp()
-          .getRequest()
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          .path.includes('/v1/auth/verify-email')) ||
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      _context
-        .switchToHttp()
-        .getRequest()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        .path.includes('/v1/auth/logout')
-    ) {
+    if (!user.isVerified && !isVerifyEmailPath && !isLogoutPath) {
       throw new ForbiddenException(
         'Please verify your email before accessing this resource',
       );
     }
 
-    const responseUser: UserInfoDto = user as UserInfoDto;
-
-    return responseUser;
+    return user as UserInfoDto;
   }
 }
