@@ -87,4 +87,38 @@ export class MoviesService {
       throw handleError(this.logger, error);
     }
   }
+
+  async addMovieRating(movieId: number, rating: number) {
+    try {
+      const movie = await this.moviesRepository.getMovieById(movieId);
+
+      if (movie.item) {
+        movie.item.vote_count = movie.item.vote_count + 1;
+        movie.item.vote_average =
+          (movie.item.vote_average + rating) / movie.item.vote_count;
+
+        await this.moviesRepository.updateMovie(movie.item);
+      }
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async updateMovieRating(
+    movieId: number,
+    ratingOld: number,
+    ratingNew: number,
+  ) {
+    const movie = await this.moviesRepository.getMovieById(movieId);
+
+    if (movie.item) {
+      const totalRating =
+        movie.item.vote_average * movie.item.vote_count - ratingOld + ratingNew;
+      const voteCount = movie.item.vote_count;
+      const voteAverage = totalRating / voteCount;
+
+      movie.item.vote_average = voteAverage;
+      await this.moviesRepository.updateMovie(movie.item);
+    }
+  }
 }

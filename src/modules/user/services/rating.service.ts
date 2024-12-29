@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { MoviesService } from '../../movie/services/movie.service';
 import { RateMovieDto } from '../domains/dtos/rate-movie.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { RatingEntity } from '../domains/entities/rating.entity';
@@ -11,7 +12,10 @@ import { RatingRepository } from '../repository/rating.repository';
 
 @Injectable()
 export class RatingService {
-  constructor(private readonly ratingRepository: RatingRepository) {}
+  constructor(
+    private readonly ratingRepository: RatingRepository,
+    private readonly moviesService: MoviesService,
+  ) {}
 
   async rateMovie(
     movieId: string,
@@ -29,12 +33,19 @@ export class RatingService {
       );
     }
 
-    return this.ratingRepository.createRating(
+    const rating = await this.ratingRepository.createRating(
       userInfo.id,
       movieId,
       rateMovieDto.rating,
       rateMovieDto.review,
     );
+
+    await this.moviesService.addMovieRating(
+      Number(movieId),
+      rateMovieDto.rating,
+    );
+
+    return rating;
   }
 
   async getUserMovieRating(
@@ -71,11 +82,17 @@ export class RatingService {
       throw new NotFoundException('Rating not found for this movie');
     }
 
-    return this.ratingRepository.updateRating(
+    await this.ratingRepository.updateRating(
       userInfo.id,
       movieId,
       rateMovieDto.rating,
       rateMovieDto.review,
+    );
+
+    await this.moviesService.updateMovieRating(
+      Number(movieId),
+      existingRating.rating,
+      rateMovieDto.rating,
     );
   }
 

@@ -130,4 +130,8 @@ export class MoviesRepository {
 
     return { item };
   }
+
+  async updateMovie(movie: MovieEntity) {
+    return this.movieRepository.save(movie);
+  }
 }
