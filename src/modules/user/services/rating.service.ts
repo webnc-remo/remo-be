@@ -73,17 +73,17 @@ export class RatingService {
     );
 
     const movies = await Promise.all(
-      ratings.map((rating) =>
-        this.moviesService.getMovieById(Number(rating.tmdb_id)),
-      ),
-    );
+      ratings.map(async (rating) => {
+        const movie = await this.moviesService.getMovieById(
+          Number(rating.tmdb_id),
+        );
 
-    const moviesWithRatings = movies.map((movie) => ({
-      ...movie,
-      rating: ratings.find(
-        (rating) => Number(rating.tmdb_id) === movie.item?.tmdb_id,
-      ),
-    }));
+        return {
+          movie,
+          rating,
+        };
+      }),
+    );
 
     const pageMetaDto = new PageMetaDto({
       pageOptionsDto,
@@ -91,7 +91,7 @@ export class RatingService {
     });
 
     return {
-      items: moviesWithRatings,
+      items: movies,
       meta: pageMetaDto,
     };
   }
