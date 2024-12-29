@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { PageMetaDto } from '../../../common/page-meta.dto';
 import { PageOptionsDto } from '../../../common/page-options.dto';
 import { MoviesService } from '../../movie/services/movie.service';
 import { RateMovieDto } from '../domains/dtos/rate-movie.dto';
@@ -71,25 +72,27 @@ export class RatingService {
       pageOptionsDto,
     );
 
-    const movieIds = ratings.map((rating) => rating.tmdb_id);
-    const movies = await this.moviesService.getMoviesByIds(
-      movieIds,
-      pageOptionsDto,
+    const movies = await Promise.all(
+      ratings.map((rating) =>
+        this.moviesService.getMovieById(Number(rating.tmdb_id)),
+      ),
     );
 
-    const moviesWithRatings = ratings.map((rating) => ({
-      ...rating,
-      movie: movies.items.find(
-        (movie) => movie.tmdb_id === Number(rating.tmdb_id),
+    const moviesWithRatings = movies.map((movie) => ({
+      ...movie,
+      rating: ratings.find(
+        (rating) => Number(rating.tmdb_id) === movie.item?.tmdb_id,
       ),
     }));
 
+    const pageMetaDto = new PageMetaDto({
+      pageOptionsDto,
+      itemCount: count,
+    });
+
     return {
       items: moviesWithRatings,
-      meta: {
-        ...movies.meta,
-        itemCount: count,
-      },
+      meta: pageMetaDto,
     };
   }
 
