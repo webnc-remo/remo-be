@@ -23,12 +23,12 @@ import { RatingService } from '../services/rating.service';
 export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
 
-  @Get('/:movieId/rating')
+  @Get('/:movieId/reviews')
   @PublicRoute(true)
   @ApiOperation({ summary: 'Get movie rating' })
   @HttpCode(HttpStatus.ACCEPTED)
   async getMovieRating(@Param('movieId') movieId: string) {
-    const rating = await this.ratingService.getUserRatingByMovieId(
+    const rating = await this.ratingService.getAllUserRatingByMovieId(
       Number(movieId),
     );
 

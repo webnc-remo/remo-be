@@ -131,8 +131,10 @@ export class RatingService {
     await this.ratingRepository.deleteRating(userInfo.id, movieId);
   }
 
-  async getUserRatingByMovieId(movieId: number) {
-    const rating = await this.ratingRepository.getUserRatingByMovieId(movieId);
+  async getAllUserRatingByMovieId(movieId: number) {
+    const rating = await this.ratingRepository.getAllUserRatingByMovieId(
+      movieId.toString(),
+    );
 
     return rating;
   }

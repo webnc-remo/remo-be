@@ -64,10 +64,22 @@ export class RatingRepository {
     });
   }
 
-  async getUserRatingByMovieId(movieId: number) {
-    return this.ratingRepository.findOne({
-      where: { tmdb_id: movieId.toString() },
+  async getAllUserRatingByMovieId(movieId: string) {
+    return this.ratingRepository.find({
+      where: { tmdb_id: movieId },
       relations: { user: true },
+      order: { createdAt: 'DESC' },
+      select: {
+        user: {
+          id: true,
+          fullName: true,
+          avatar: true,
+        },
+        id: true,
+        rating: true,
+        review: true,
+        createdAt: true,
+      },
     });
   }
 }
