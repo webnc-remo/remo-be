@@ -87,10 +87,8 @@ export class RatingService {
     return {
       items: moviesWithRatings,
       meta: {
-        total: count,
-        page: pageOptionsDto.page,
-        take: pageOptionsDto.take,
-        skip: pageOptionsDto.skip,
+        ...movies.meta,
+        itemCount: count,
       },
     };
   }
