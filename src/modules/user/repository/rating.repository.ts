@@ -28,20 +28,27 @@ export class RatingRepository {
     userId: string,
     movieId: string,
     rating: number,
+    review?: string,
   ): Promise<RatingEntity> {
     const newRating = this.ratingRepository.create({
       user: { id: userId },
       tmdb_id: movieId,
       rating,
+      review,
     });
 
     return this.ratingRepository.save(newRating);
   }
 
-  async updateRating(userId: string, movieId: string, rating: number) {
+  async updateRating(
+    userId: string,
+    movieId: string,
+    rating: number,
+    review?: string,
+  ) {
     await this.ratingRepository.update(
       { user: { id: userId }, tmdb_id: movieId },
-      { rating },
+      { rating, review },
     );
 
     return this.findUserRating(userId, movieId);

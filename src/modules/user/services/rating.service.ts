@@ -33,6 +33,7 @@ export class RatingService {
       userInfo.id,
       movieId,
       rateMovieDto.rating,
+      rateMovieDto.review,
     );
   }
 
@@ -74,6 +75,7 @@ export class RatingService {
       userInfo.id,
       movieId,
       rateMovieDto.rating,
+      rateMovieDto.review,
     );
   }
 
