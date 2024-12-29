@@ -46,6 +46,7 @@ export class UserRepository implements IUserRepository {
       socialProvider: 'google',
       password: '',
       createdAt: new Date(),
+      isVerified: true,
     });
   }
 }
