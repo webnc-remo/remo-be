@@ -66,7 +66,7 @@ export class RatingService {
   }
 
   async getUserRatings(userInfo: UserInfoDto, pageOptionsDto: PageOptionsDto) {
-    const ratings = await this.ratingRepository.getUserRatings(
+    const [ratings, count] = await this.ratingRepository.getUserRatings(
       userInfo.id,
       pageOptionsDto,
     );
@@ -86,7 +86,12 @@ export class RatingService {
 
     return {
       items: moviesWithRatings,
-      meta: movies.meta,
+      meta: {
+        total: count,
+        page: pageOptionsDto.page,
+        take: pageOptionsDto.take,
+        skip: pageOptionsDto.skip,
+      },
     };
   }
 

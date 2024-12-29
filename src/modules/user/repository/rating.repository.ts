@@ -19,7 +19,7 @@ export class RatingRepository {
   }
 
   async getUserRatings(userId: string, pageOptionsDto: PageOptionsDto) {
-    return this.ratingRepository.find({
+    return this.ratingRepository.findAndCount({
       where: { user: { id: userId } },
       order: { createdAt: 'DESC' },
       skip: pageOptionsDto.skip,
