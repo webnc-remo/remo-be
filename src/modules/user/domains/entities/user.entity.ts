@@ -4,6 +4,11 @@ import { RefreshTokenEntity } from '../../../auth/domains/entities/token.entity'
 import { RatingEntity } from './rating.entity';
 import { UserMovieListEntity } from './user-movie-list.entity';
 
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
+
 @Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -23,6 +28,16 @@ export class UserEntity {
 
   @Column({ type: 'varchar', nullable: true })
   socialProvider!: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
+  role!: UserRole;
+
+  @Column({ type: 'boolean', default: false })
+  isVerified!: boolean;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;
