@@ -72,6 +72,7 @@ export class RatingRepository {
       select: {
         user: {
           id: true,
+          email: true,
           fullName: true,
           avatar: true,
         },
