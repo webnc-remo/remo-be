@@ -15,7 +15,7 @@ import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { RatingService } from '../services/rating.service';
 
 @ApiTags('User Movie Ratings')
-@Controller('ratings')
+@Controller('/v1/user/ratings')
 @ApiBearerAuth()
 export class RatingController {
   constructor(private readonly ratingService: RatingService) {}
