@@ -8,6 +8,18 @@ export class DecodedTokenDto {
   email!: string;
 
   @ApiProperty()
+  fullName!: string;
+
+  @ApiProperty()
+  avatar!: string;
+
+  @ApiProperty()
+  role!: string;
+
+  @ApiProperty()
+  isVerified!: boolean;
+
+  @ApiProperty()
   iat!: number;
 
   @ApiProperty()

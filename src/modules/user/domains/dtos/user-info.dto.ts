@@ -34,11 +34,11 @@ export class UserInfoDto {
     example: 'ADMIN',
     description: 'User role',
   })
-  role?: string | null;
+  role?: string;
 
   @ApiProperty({
     example: true,
     description: 'User is verified',
   })
-  isVerified?: boolean | null;
+  isVerified?: boolean;
 }

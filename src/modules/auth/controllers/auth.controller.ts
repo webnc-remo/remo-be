@@ -30,6 +30,7 @@ import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RefreshTokenRequestDto } from '../domains/dtos/requests/refresh-token.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
+import { VerifyEmailDto } from '../domains/dtos/requests/verify-email.dto';
 import { IAuthService } from '../services/auth.service';
 
 @Controller('/v1/auth')
@@ -176,7 +177,15 @@ export class AuthController {
     status: HttpStatus.OK,
     description: 'Email verified successfully',
   })
-  async verifyEmail(@AuthUser() user: UserInfoDto, @Body('code') code: string) {
-    return this.authService.verifyEmail(user.id, code);
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid or expired verification code',
+  })
+  @ApiBearerAuth()
+  async verifyEmail(
+    @AuthUser() user: UserInfoDto,
+    @Body() verifyEmailDto: VerifyEmailDto,
+  ) {
+    return this.authService.verifyEmail(user, verifyEmailDto.code);
   }
 }

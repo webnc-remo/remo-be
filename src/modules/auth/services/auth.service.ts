@@ -40,7 +40,10 @@ export interface IAuthService {
   renewToken(
     refreshToken: RefreshTokenRequestDto,
   ): Promise<TokenPayloadResponseDto>;
-  verifyEmail(userId: string, code: string): Promise<boolean>;
+  verifyEmail(
+    user: UserInfoDto,
+    code: string,
+  ): Promise<TokenPayloadResponseDto>;
 }
 
 @Injectable()
@@ -97,10 +100,15 @@ export class AuthService implements IAuthService {
         email: user.email,
         fullName: user.fullName,
         avatar: user.avatar,
+        role: user.role || 'USER',
+        isVerified: user.isVerified || false,
       };
+
+      // Generate tokens
       const refreshToken = await this.signRefreshToken(userInfo);
       const accessToken = this.jwtService.sign(userInfo);
 
+      // Generate and save verification code
       const code = this.generateVerificationCode();
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24);
@@ -111,13 +119,12 @@ export class AuthService implements IAuthService {
         expiresAt,
       );
 
-      // Send verification email
       await this.mailService.sendVerificationCode(user.email!, code);
 
       return {
         accessToken,
         refreshToken,
-        user,
+        user: userInfo,
       };
     } catch (error) {
       throw handleError(this.logger, error);
@@ -283,18 +290,43 @@ export class AuthService implements IAuthService {
     }
   }
 
-  async verifyEmail(userId: string, code: string): Promise<boolean> {
-    const verificationCode =
-      await this.verificationCodeRepository.findValidCode(userId, code);
+  async verifyEmail(
+    user: UserInfoDto,
+    code: string,
+  ): Promise<TokenPayloadResponseDto> {
+    try {
+      const verificationCode =
+        await this.verificationCodeRepository.findValidCode(user.id, code);
 
-    if (!verificationCode) {
-      throw new BadRequestException('Invalid or expired verification code');
+      if (!verificationCode) {
+        throw new BadRequestException('Invalid or expired verification code');
+      }
+
+      await this.authRepository.removeAllUserTokens(user.id);
+
+      await this.userService.verifyUser(user.id);
+
+      await this.verificationCodeRepository.deleteCode(verificationCode.id);
+
+      const userInfo: UserInfoDto = {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        avatar: user.avatar,
+        role: user.role || 'USER',
+        isVerified: true,
+      };
+
+      const refreshToken = await this.signRefreshToken(userInfo);
+      const accessToken = this.jwtService.sign(userInfo);
+
+      return {
+        accessToken,
+        refreshToken,
+        user: userInfo,
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
     }
-
-    await this.userService.verifyUser(userId);
-
-    await this.verificationCodeRepository.deleteCode(verificationCode.id);
-
-    return true;
   }
 }

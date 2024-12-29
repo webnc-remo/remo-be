@@ -16,6 +16,7 @@ export interface IAuthRepository {
     token: string,
   ): Promise<RefreshTokenEntity>;
   isTokenExist(userId: string, refreshToken: string): Promise<boolean>;
+  removeAllUserTokens(userId: string): Promise<void>;
 }
 
 @Injectable()
@@ -74,5 +75,14 @@ export class AuthRepository implements IAuthRepository {
     });
 
     return Boolean(token);
+  }
+
+  async removeAllUserTokens(userId: string): Promise<void> {
+    await this.tokenRepository
+      .createQueryBuilder()
+      .delete()
+      .from(RefreshTokenEntity)
+      .where('user_id = :userId', { userId })
+      .execute();
   }
 }
