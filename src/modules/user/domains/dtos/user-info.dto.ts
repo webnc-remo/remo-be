@@ -12,7 +12,7 @@ export class UserInfoDto {
   id!: string;
 
   @ApiProperty({
-    example: 'tantran.300803@gmail.com',
+    example: 'admin@gmail.com',
     description: 'User email',
   })
   @EmailFieldOptional({ nullable: true })
@@ -29,4 +29,10 @@ export class UserInfoDto {
     description: 'User avatar',
   })
   avatar?: string | null;
+
+  @ApiProperty({
+    example: 'ADMIN',
+    description: 'User role',
+  })
+  role?: string | null;
 }

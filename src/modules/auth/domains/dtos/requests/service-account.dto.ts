@@ -2,7 +2,7 @@ import { StringField, UUIDField } from '../../../../../decorators';
 
 export class ServiceAccount {
   @StringField({
-    example: 'tantran.300803@gmail.com',
+    example: 'admin@gmail.com',
     description: 'Email of Account',
   })
   email!: string;

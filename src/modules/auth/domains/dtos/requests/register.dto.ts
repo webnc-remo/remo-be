@@ -7,7 +7,7 @@ import {
 
 export class RegisterRequestDto {
   @ApiProperty({
-    example: 'tantran.300803@gmail.com',
+    example: 'admin@gmail.com',
     description: 'User email',
   })
   @EmailFieldOptional({ nullable: true })

@@ -80,6 +80,5 @@ import { SharedModule } from './shared/shared.module';
       },
     }),
   ],
-  providers: [],
 })
 export class AppModule {}

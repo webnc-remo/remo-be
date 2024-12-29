@@ -20,8 +20,12 @@ import {
 } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 
+import { UserRole } from '../../../constants';
 import { AuthUser, PublicRoute } from '../../../decorators';
+import { Roles } from '../../../decorators/roles.decorator';
 import { GoogleOauthGuard } from '../../../guards/google-oauth.guard';
+import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
+import { RolesGuard } from '../../../guards/roles.guard';
 import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RefreshTokenRequestDto } from '../domains/dtos/requests/refresh-token.dto';
@@ -144,5 +148,23 @@ export class AuthController {
     const newPairToken = await this.authService.renewToken(token);
 
     return newPairToken;
+  }
+
+  @Get('admin/hello')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Admin only endpoint' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Hello from admin endpoint',
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'User is not an admin',
+  })
+  @ApiBearerAuth()
+  adminOnlyEndpoint() {
+    return { message: 'Hello World! This is admin only endpoint.' };
   }
 }

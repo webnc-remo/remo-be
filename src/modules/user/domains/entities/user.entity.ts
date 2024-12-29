@@ -1,13 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { UserRole } from '../../../../constants';
 import { RefreshTokenEntity } from '../../../auth/domains/entities/token.entity';
 import { RatingEntity } from './rating.entity';
 import { UserMovieListEntity } from './user-movie-list.entity';
-
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
 
 @Entity({ name: 'users' })
 export class UserEntity {
