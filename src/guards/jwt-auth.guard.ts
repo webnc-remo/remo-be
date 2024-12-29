@@ -1,5 +1,6 @@
 import {
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -44,6 +45,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   ): UserInfoDto {
     if (err || !user) {
       throw err || new UnauthorizedException('Access Token is Invalid');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (!user.isVerified) {
+      throw new ForbiddenException(
+        'Please verify your email before accessing this resource',
+      );
     }
 
     const responseUser: UserInfoDto = user as UserInfoDto;

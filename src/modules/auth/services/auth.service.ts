@@ -163,6 +163,7 @@ export class AuthService implements IAuthService {
         fullName: user.fullName,
         avatar: user.avatar,
         role: user.role,
+        isVerified: user.isVerified,
       };
       const refreshToken = await this.signRefreshToken(userInfo);
       const accessToken = this.jwtService.sign(userInfo);
