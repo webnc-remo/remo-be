@@ -1,5 +1,5 @@
 {
-  "language": "ts",
+  "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
@@ -8,7 +8,7 @@
     ],
     "assets": [
       {
-        "include": "i18n/**/*",
+        "include": "modules/mail/templates/*.hbs",
         "watchAssets": true
       }
     ]

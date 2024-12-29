@@ -12,6 +12,7 @@ export interface IUserRepository {
   createUserWithGoogleLogin(
     googleAccount: GoogleAccount,
   ): Promise<UserEntity | null>;
+  verifyUser(userId: string): Promise<void>;
 }
 
 @Injectable()
@@ -48,5 +49,9 @@ export class UserRepository implements IUserRepository {
       createdAt: new Date(),
       isVerified: true,
     });
+  }
+
+  async verifyUser(userId: string): Promise<void> {
+    await this.userRepository.update(userId, { isVerified: true });
   }
 }

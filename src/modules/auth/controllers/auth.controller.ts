@@ -167,4 +167,16 @@ export class AuthController {
   adminOnlyEndpoint() {
     return { message: 'Hello World! This is admin only endpoint.' };
   }
+
+  @Post('verify-email')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Verify email with code' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Email verified successfully',
+  })
+  async verifyEmail(@AuthUser() user: UserInfoDto, @Body('code') code: string) {
+    return this.authService.verifyEmail(user.id, code);
+  }
 }

@@ -20,6 +20,7 @@ export interface IUserService {
   createUserWithGoogleLogin(
     googleAccount: GoogleAccount,
   ): Promise<UserEntity | null>;
+  verifyUser(userId: string): Promise<void>;
 }
 
 @Injectable()
@@ -93,5 +94,9 @@ export class UserService implements IUserService {
     } catch (error) {
       throw handleError(this.logger, error);
     }
+  }
+
+  async verifyUser(userId: string): Promise<void> {
+    await this.userRepository.verifyUser(userId);
   }
 }

@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { generateHash, handleError, validateHash } from '../../../common/utils';
+import { MailService } from '../../mail/mail.service';
 import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
 import { IUserService } from '../../user/services/user.service';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
@@ -20,6 +21,7 @@ import { LogoutResponseDto } from '../domains/dtos/responses/logout.dto';
 import { RegisterResponseDto } from '../domains/dtos/responses/register.dto';
 import { TokenPayloadResponseDto } from '../domains/dtos/responses/token.dto';
 import { AuthRepository } from '../repository/auth.repository';
+import { VerificationCodeRepository } from '../repository/verification-code.repository';
 
 export interface IAuthService {
   handleRegister(
@@ -38,6 +40,7 @@ export interface IAuthService {
   renewToken(
     refreshToken: RefreshTokenRequestDto,
   ): Promise<TokenPayloadResponseDto>;
+  verifyEmail(userId: string, code: string): Promise<boolean>;
 }
 
 @Injectable()
@@ -52,8 +55,14 @@ export class AuthService implements IAuthService {
     private readonly userService: IUserService,
 
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+    private readonly verificationCodeRepository: VerificationCodeRepository,
   ) {
     this.logger = new Logger(AuthService.name);
+  }
+
+  private generateVerificationCode(): string {
+    return Math.floor(100_000 + Math.random() * 900_000).toString();
   }
 
   async handleRegister(
@@ -91,6 +100,19 @@ export class AuthService implements IAuthService {
       };
       const refreshToken = await this.signRefreshToken(userInfo);
       const accessToken = this.jwtService.sign(userInfo);
+
+      const code = this.generateVerificationCode();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+
+      await this.verificationCodeRepository.createVerificationCode(
+        user.id,
+        code,
+        expiresAt,
+      );
+
+      // Send verification email
+      await this.mailService.sendVerificationCode(user.email!, code);
 
       return {
         accessToken,
@@ -259,5 +281,20 @@ export class AuthService implements IAuthService {
     } catch (error) {
       throw handleError(this.logger, error);
     }
+  }
+
+  async verifyEmail(userId: string, code: string): Promise<boolean> {
+    const verificationCode =
+      await this.verificationCodeRepository.findValidCode(userId, code);
+
+    if (!verificationCode) {
+      throw new BadRequestException('Invalid or expired verification code');
+    }
+
+    await this.userService.verifyUser(userId);
+
+    await this.verificationCodeRepository.deleteCode(verificationCode.id);
+
+    return true;
   }
 }
