@@ -93,9 +93,12 @@ export class MoviesService {
       const movie = await this.moviesRepository.getMovieById(movieId);
 
       if (movie.item) {
-        movie.item.vote_count = movie.item.vote_count + 1;
-        movie.item.vote_average =
-          (movie.item.vote_average + rating) / movie.item.vote_count;
+        const totalRating =
+          movie.item.vote_average * movie.item.vote_count + rating;
+        const voteCount = movie.item.vote_count + 1;
+        const voteAverage = totalRating / voteCount;
+
+        movie.item.vote_average = voteAverage;
 
         await this.moviesRepository.updateMovie(movie.item);
       }

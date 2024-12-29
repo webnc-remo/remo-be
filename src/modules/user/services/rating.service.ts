@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { MoviesService } from '../../movie/services/movie.service';
 import { RateMovieDto } from '../domains/dtos/rate-movie.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
@@ -64,8 +65,29 @@ export class RatingService {
     return rating;
   }
 
-  async getUserRatings(userInfo: UserInfoDto): Promise<RatingEntity[]> {
-    return this.ratingRepository.getUserRatings(userInfo.id);
+  async getUserRatings(userInfo: UserInfoDto, pageOptionsDto: PageOptionsDto) {
+    const ratings = await this.ratingRepository.getUserRatings(
+      userInfo.id,
+      pageOptionsDto,
+    );
+
+    const movieIds = ratings.map((rating) => rating.tmdb_id);
+    const movies = await this.moviesService.getMoviesByIds(
+      movieIds,
+      pageOptionsDto,
+    );
+
+    const moviesWithRatings = ratings.map((rating) => ({
+      ...rating,
+      movie: movies.items.find(
+        (movie) => movie.tmdb_id === Number(rating.tmdb_id),
+      ),
+    }));
+
+    return {
+      items: moviesWithRatings,
+      meta: movies.meta,
+    };
   }
 
   async updateRating(
@@ -107,5 +129,11 @@ export class RatingService {
     }
 
     await this.ratingRepository.deleteRating(userInfo.id, movieId);
+  }
+
+  async getUserRatingByMovieId(movieId: number) {
+    const rating = await this.ratingRepository.getUserRatingByMovieId(movieId);
+
+    return rating;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { PageOptionsDto } from '../../../common/page-options.dto';
 import { RatingEntity } from '../domains/entities/rating.entity';
 
 @Injectable()
@@ -17,10 +18,12 @@ export class RatingRepository {
     });
   }
 
-  async getUserRatings(userId: string) {
+  async getUserRatings(userId: string, pageOptionsDto: PageOptionsDto) {
     return this.ratingRepository.find({
       where: { user: { id: userId } },
       order: { createdAt: 'DESC' },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
     });
   }
 
@@ -58,6 +61,13 @@ export class RatingRepository {
     await this.ratingRepository.delete({
       user: { id: userId },
       tmdb_id: movieId,
+    });
+  }
+
+  async getUserRatingByMovieId(movieId: number) {
+    return this.ratingRepository.findOne({
+      where: { tmdb_id: movieId.toString() },
+      relations: { user: true },
     });
   }
 }
