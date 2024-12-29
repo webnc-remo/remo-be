@@ -48,7 +48,17 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (!user.isVerified) {
+    // except for /v1/auth/verify-email
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      !user.isVerified &&
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      !_context
+        .switchToHttp()
+        .getRequest()
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        .path.includes('/v1/auth/verify-email')
+    ) {
       throw new ForbiddenException(
         'Please verify your email before accessing this resource',
       );

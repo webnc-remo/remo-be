@@ -24,9 +24,9 @@ import { JwtStrategy } from './services/strategies/jwt.strategy';
       imports: [ConfigModule],
       // eslint-disable-next-line @typescript-eslint/require-await
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_ACCESS_SECRET'),
+        secret: configService.get<string>('JWT_ACCESS_SECRET'),
         signOptions: {
-          expiresIn: configService.get('JWT_EXPIRATION_TIME'),
+          expiresIn: configService.get<string>('JWT_ACCESS_EXPIRED'),
         },
       }),
       inject: [ConfigService],
