@@ -384,7 +384,7 @@ export class AuthService implements IAuthService {
       );
 
       const resetLink = `${this.configService.get<string>(
-        'CLIENT_URL',
+        'CLIENT_HOST',
       )}/reset-password?token=${resetToken}`;
 
       await this.mailService.sendResetPasswordLink(email, resetLink);
