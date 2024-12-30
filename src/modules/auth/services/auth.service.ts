@@ -44,6 +44,7 @@ export interface IAuthService {
     user: UserInfoDto,
     code: string,
   ): Promise<TokenPayloadResponseDto>;
+  resendVerificationCode(user: UserInfoDto): Promise<{ message: string }>;
 }
 
 @Injectable()
@@ -324,6 +325,36 @@ export class AuthService implements IAuthService {
         accessToken,
         refreshToken,
         user: userInfo,
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async resendVerificationCode(
+    user: UserInfoDto,
+  ): Promise<{ message: string }> {
+    try {
+      if (user.isVerified) {
+        throw new BadRequestException('User is already verified');
+      }
+
+      await this.verificationCodeRepository.deleteExistingCode(user.id);
+
+      const code = this.generateVerificationCode();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+
+      await this.verificationCodeRepository.createVerificationCode(
+        user.id,
+        code,
+        expiresAt,
+      );
+
+      await this.mailService.sendVerificationCode(user.email!, code);
+
+      return {
+        message: 'Verification code has been sent to your email',
       };
     } catch (error) {
       throw handleError(this.logger, error);

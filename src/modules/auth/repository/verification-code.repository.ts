@@ -39,4 +39,8 @@ export class VerificationCodeRepository {
   async deleteCode(id: string): Promise<void> {
     await this.repository.delete(id);
   }
+
+  async deleteExistingCode(userId: string): Promise<void> {
+    await this.repository.delete({ userId });
+  }
 }

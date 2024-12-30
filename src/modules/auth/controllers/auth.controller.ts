@@ -188,4 +188,21 @@ export class AuthController {
   ) {
     return this.authService.verifyEmail(user, verifyEmailDto.code);
   }
+
+  @Post('resend-verification')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Resend verification code' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Verification code resent successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'User is already verified or too many requests',
+  })
+  @ApiBearerAuth()
+  async resendVerificationCode(@AuthUser() user: UserInfoDto) {
+    return this.authService.resendVerificationCode(user);
+  }
 }
