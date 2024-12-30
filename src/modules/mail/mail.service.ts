@@ -21,8 +21,23 @@ export class MailService {
         template: 'verification',
         context: {
           code,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          appName: this.configService.get('APP_NAME'),
+          appName: this.configService.get<string>('APP_NAME'),
+        },
+      });
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async sendResetPasswordLink(email: string, code: string): Promise<void> {
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Reset Password Code',
+        template: 'reset-password',
+        context: {
+          code,
+          appName: this.configService.get<string>('APP_NAME'),
         },
       });
     } catch (error) {

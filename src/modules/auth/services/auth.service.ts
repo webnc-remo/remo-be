@@ -45,6 +45,12 @@ export interface IAuthService {
     code: string,
   ): Promise<TokenPayloadResponseDto>;
   resendVerificationCode(user: UserInfoDto): Promise<{ message: string }>;
+  handleForgotPassword(email: string): Promise<{ message: string }>;
+  handleResetPassword(
+    code: string,
+    newPassword: string,
+  ): Promise<{ message: string }>;
+  verifyResetToken(token: string): Promise<boolean>;
 }
 
 @Injectable()
@@ -355,6 +361,77 @@ export class AuthService implements IAuthService {
 
       return {
         message: 'Verification code has been sent to your email',
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async handleForgotPassword(email: string): Promise<{ message: string }> {
+    try {
+      const user = await this.userService.getUserByEmail(email);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const resetToken = this.jwtService.sign(
+        { id: user.id, email: user.email },
+        {
+          secret: this.configService.get<string>('JWT_RESET_SECRET'),
+          expiresIn: '1h',
+        },
+      );
+
+      const resetLink = `${this.configService.get<string>(
+        'CLIENT_URL',
+      )}/reset-password?token=${resetToken}`;
+
+      await this.mailService.sendResetPasswordLink(email, resetLink);
+
+      return {
+        message: 'Password reset link has been sent to your email',
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async verifyResetToken(token: string): Promise<boolean> {
+    try {
+      const decoded: DecodedTokenDto = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_RESET_SECRET'),
+      });
+
+      const user = await this.userService.getUserByEmail(decoded.email);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      return true;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async handleResetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    try {
+      const decoded: DecodedTokenDto = this.jwtService.verify(token, {
+        secret: this.configService.get<string>('JWT_RESET_SECRET'),
+      });
+
+      const hashedPassword = generateHash(newPassword);
+
+      await this.userService.updateUserPassword(decoded.id, hashedPassword);
+
+      await this.authRepository.removeAllUserTokens(decoded.id);
+
+      return {
+        message: 'Password has been reset successfully',
       };
     } catch (error) {
       throw handleError(this.logger, error);

@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -27,6 +28,10 @@ import { GoogleOauthGuard } from '../../../guards/google-oauth.guard';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../../guards/roles.guard';
 import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
+import {
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from '../domains/dtos/requests/forgot-password.dto';
 import { LoginRequestDto } from '../domains/dtos/requests/login.dto';
 import { RefreshTokenRequestDto } from '../domains/dtos/requests/refresh-token.dto';
 import { RegisterRequestDto } from '../domains/dtos/requests/register.dto';
@@ -204,5 +209,46 @@ export class AuthController {
   @ApiBearerAuth()
   async resendVerificationCode(@AuthUser() user: UserInfoDto) {
     return this.authService.resendVerificationCode(user);
+  }
+
+  @Post('forgot-password')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Request password reset link' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Reset link sent successfully',
+  })
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.handleForgotPassword(forgotPasswordDto.email);
+  }
+
+  @Get('reset-password')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Verify reset password token' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Token is valid',
+  })
+  verifyResetToken(@Query('token') token: string) {
+    return this.authService.verifyResetToken(token);
+  }
+
+  @Post('reset-password')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Reset password with token' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password reset successfully',
+  })
+  async resetPassword(
+    @Query('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
+    return this.authService.handleResetPassword(
+      token,
+      resetPasswordDto.newPassword,
+    );
   }
 }

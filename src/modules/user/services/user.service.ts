@@ -21,6 +21,7 @@ export interface IUserService {
     googleAccount: GoogleAccount,
   ): Promise<UserEntity | null>;
   verifyUser(userId: string): Promise<void>;
+  updateUserPassword(userId: string, password: string): Promise<void>;
 }
 
 @Injectable()
@@ -98,5 +99,9 @@ export class UserService implements IUserService {
 
   async verifyUser(userId: string): Promise<void> {
     await this.userRepository.verifyUser(userId);
+  }
+
+  async updateUserPassword(userId: string, password: string): Promise<void> {
+    await this.userRepository.updatePassword(userId, password);
   }
 }

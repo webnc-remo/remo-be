@@ -54,4 +54,8 @@ export class UserRepository implements IUserRepository {
   async verifyUser(userId: string): Promise<void> {
     await this.userRepository.update(userId, { isVerified: true });
   }
+
+  async updatePassword(userId: string, password: string): Promise<void> {
+    await this.userRepository.update(userId, { password });
+  }
 }
