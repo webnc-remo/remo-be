@@ -5,6 +5,7 @@ import { handleError } from '../../../common/utils';
 import { MovieTrendingDayEntity } from '../domains/schemas/movie-trending-day.schema';
 import { MoviesRepository } from '../repository/movie.repository';
 import { MovieGenresRepository } from '../repository/movie-genres.repository';
+import { MoviePopularRepository } from '../repository/movie-popular.repository';
 import { MovieTrendingDayRepository } from '../repository/movie-trending-day.repository';
 import { MovieTrendingWeekRepository } from '../repository/movie-trending-week.repository';
 
@@ -17,6 +18,7 @@ export class MoviesService {
     private readonly movieTrendingDayRepository: MovieTrendingDayRepository,
     private readonly movieTrendingWeekRepository: MovieTrendingWeekRepository,
     private readonly movieGenresRepository: MovieGenresRepository,
+    private readonly moviePopularRepository: MoviePopularRepository,
   ) {
     this.logger = new Logger(MoviesService.name);
   }
@@ -54,6 +56,16 @@ export class MoviesService {
       }
 
       return trending;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async popular() {
+    try {
+      const movies = await this.moviePopularRepository.findMoviesPopular();
+
+      return movies;
     } catch (error) {
       throw handleError(this.logger, error);
     }

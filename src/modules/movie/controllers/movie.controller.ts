@@ -58,6 +58,24 @@ export class MoviesController {
     return { results: movies };
   }
 
+  @Get('/popular')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Get popular movies' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Movies retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Movies not found',
+  })
+  async popular() {
+    const movies = await this.moviesService.popular();
+
+    return { results: movies };
+  }
+
   @Get('/genres')
   @PublicRoute(true)
   @ApiOperation({ summary: 'Get all genres' })
