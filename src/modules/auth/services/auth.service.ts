@@ -237,13 +237,18 @@ export class AuthService implements IAuthService {
     userInfo: UserInfoDto,
   ): Promise<LoginResponseDto | null> {
     try {
-      const refreshToken = await this.signRefreshToken(userInfo);
-      const accessToken = this.jwtService.sign(userInfo);
+      const userInfoWithVerified: UserInfoDto = {
+        ...userInfo,
+        isVerified: true,
+      };
+
+      const refreshToken = await this.signRefreshToken(userInfoWithVerified);
+      const accessToken = this.jwtService.sign(userInfoWithVerified);
 
       return {
         accessToken,
         refreshToken,
-        user: userInfo,
+        user: userInfoWithVerified,
       };
     } catch (error) {
       throw handleError(this.logger, error);
