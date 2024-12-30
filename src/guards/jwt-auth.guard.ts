@@ -52,11 +52,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const isVerifyEmailPath = path === '/v1/auth/verify-email';
     const isLogoutPath = path === '/v1/auth/logout';
+    const isResendVerificationPath = path === '/v1/auth/resend-verification';
 
     // Allow unverified users to access verify-email endpoint
     // Allow both verified and unverified users to logout
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    if (!user.isVerified && !isVerifyEmailPath && !isLogoutPath) {
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      !user.isVerified &&
+      !isVerifyEmailPath &&
+      !isLogoutPath &&
+      !isResendVerificationPath
+    ) {
       throw new ForbiddenException(
         'Please verify your email before accessing this resource',
       );
