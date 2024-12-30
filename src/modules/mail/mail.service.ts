@@ -44,4 +44,12 @@ export class MailService {
       throw handleError(this.logger, error);
     }
   }
+
+  async sendPasswordChangedNotification(email: string): Promise<void> {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Password Changed Successfully',
+      template: 'password-changed',
+    });
+  }
 }

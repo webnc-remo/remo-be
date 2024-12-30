@@ -28,6 +28,7 @@ import { GoogleOauthGuard } from '../../../guards/google-oauth.guard';
 import { JwtAuthGuard } from '../../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../../guards/roles.guard';
 import { UserInfoDto } from '../../user/domains/dtos/user-info.dto';
+import { ChangePasswordDto } from '../domains/dtos/requests/change-password.dto';
 import {
   ForgotPasswordDto,
   ResetPasswordDto,
@@ -249,6 +250,30 @@ export class AuthController {
     return this.authService.handleResetPassword(
       token,
       resetPasswordDto.newPassword,
+    );
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Change password' })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Password changed successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Current password is incorrect',
+  })
+  @ApiBearerAuth()
+  async changePassword(
+    @AuthUser() user: UserInfoDto,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.authService.changePassword(
+      user.id,
+      changePasswordDto.oldPassword,
+      changePasswordDto.newPassword,
     );
   }
 }

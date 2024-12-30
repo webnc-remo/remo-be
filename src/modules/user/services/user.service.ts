@@ -22,6 +22,7 @@ export interface IUserService {
   ): Promise<UserEntity | null>;
   verifyUser(userId: string): Promise<void>;
   updateUserPassword(userId: string, password: string): Promise<void>;
+  getUserById(userId: string): Promise<UserEntity | null>;
 }
 
 @Injectable()
@@ -103,5 +104,15 @@ export class UserService implements IUserService {
 
   async updateUserPassword(userId: string, password: string): Promise<void> {
     await this.userRepository.updatePassword(userId, password);
+  }
+
+  async getUserById(userId: string): Promise<UserEntity | null> {
+    try {
+      const user = await this.userRepository.findUserById(userId);
+
+      return user;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
   }
 }

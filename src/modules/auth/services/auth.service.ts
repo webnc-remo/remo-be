@@ -51,6 +51,11 @@ export interface IAuthService {
     newPassword: string,
   ): Promise<{ message: string }>;
   verifyResetToken(token: string): Promise<boolean>;
+  changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<{ message: string }>;
 }
 
 @Injectable()
@@ -437,6 +442,42 @@ export class AuthService implements IAuthService {
 
       return {
         message: 'Password has been reset successfully',
+      };
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    try {
+      const user = await this.userService.getUserById(userId);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const isCorrectPassword = validateHash(oldPassword, user.password);
+
+      if (!isCorrectPassword) {
+        throw new BadRequestException('Current password is incorrect');
+      }
+
+      const hashedPassword = generateHash(newPassword);
+
+      await this.userService.updateUserPassword(userId, hashedPassword);
+
+      // Remove all refresh tokens after password change
+      await this.authRepository.removeAllUserTokens(userId);
+
+      // Send email notification
+      await this.mailService.sendPasswordChangedNotification(user.email!);
+
+      return {
+        message: 'Password has been changed successfully',
       };
     } catch (error) {
       throw handleError(this.logger, error);
