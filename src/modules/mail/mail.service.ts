@@ -29,14 +29,14 @@ export class MailService {
     }
   }
 
-  async sendResetPasswordLink(email: string, code: string): Promise<void> {
+  async sendResetPasswordLink(email: string, resetLink: string): Promise<void> {
     try {
       await this.mailerService.sendMail({
         to: email,
         subject: 'Reset Password Code',
         template: 'reset-password',
         context: {
-          code,
+          resetLink,
           appName: this.configService.get<string>('APP_NAME'),
         },
       });
