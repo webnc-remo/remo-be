@@ -90,6 +90,17 @@ export class MoviesService {
     return movies;
   }
 
+  async getMoviesByObjectIds(movieObjectIds: string[]) {
+    try {
+      const movies =
+        await this.moviesRepository.findByObjectIds(movieObjectIds);
+
+      return movies;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
   async getGenres() {
     try {
       const genres = await this.movieGenresRepository.getAll();

@@ -41,4 +41,7 @@ export class PageOptionsDto {
 
   @StringFieldOptional()
   readonly rating?: string;
+
+  @StringFieldOptional()
+  readonly isLLM?: string;
 }

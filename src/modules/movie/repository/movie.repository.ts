@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ObjectId } from 'mongodb';
 import { FilterQuery } from 'mongoose';
 import { MongoRepository } from 'typeorm';
 
@@ -115,6 +116,36 @@ export class MoviesRepository {
     return {
       items: movies,
       meta: pageMetaDto,
+    };
+  }
+
+  async findByObjectIds(ids: string[]) {
+    // Convert string ids to MongoDB ObjectId
+    const objectIds = ids.map((id) => new ObjectId(id));
+
+    const [movies] = await this.movieRepository.findAndCount({
+      where: { _id: { $in: objectIds } },
+      select: [
+        'tmdb_id',
+        'title',
+        'original_title',
+        'poster_path',
+        'release_date',
+        'vote_average',
+        'vote_count',
+        'overview',
+        'popularity',
+        'adult',
+        'backdrop_path',
+        'original_language',
+        'video',
+        'tagline',
+        'genres',
+      ],
+    });
+
+    return {
+      items: movies,
     };
   }
 

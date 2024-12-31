@@ -15,12 +15,16 @@ import {
 
 import { PageOptionsDto } from '../../../common/page-options.dto';
 import { PublicRoute } from '../../../decorators';
+import { LLMSearchService } from '../../../modules/llm/service/llm.service';
 import { MoviesService } from '../services/movie.service';
 
 @Controller('/v1/movies')
 @ApiTags('movies')
 export class MoviesController {
-  constructor(private readonly moviesService: MoviesService) {}
+  constructor(
+    private readonly moviesService: MoviesService,
+    private readonly llmService: LLMSearchService,
+  ) {}
 
   @Get('/search')
   @PublicRoute(true)
@@ -35,6 +39,19 @@ export class MoviesController {
     description: 'Movies not found',
   })
   async search(@Query() pageOptionsDto: PageOptionsDto) {
+    const { isLLM } = pageOptionsDto;
+
+    if (isLLM && isLLM.length > 0) {
+      const { movieIDs, pageMetaDto } =
+        await this.llmService.search(pageOptionsDto);
+      const movies = await this.moviesService.getMoviesByObjectIds(movieIDs);
+
+      return {
+        items: movies.items,
+        meta: pageMetaDto,
+      };
+    }
+
     const movies = await this.moviesService.search(pageOptionsDto);
 
     return movies;

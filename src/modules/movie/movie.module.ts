@@ -1,6 +1,9 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { LlmRepository } from '../../modules/llm/repository/llm.repository';
+import { LLMSearchService } from '../../modules/llm/service/llm.service';
 import { MoviesController } from './controllers/movie.controller';
 import { MovieEntity } from './domains/schemas/movie.schema';
 import { GenreEntity } from './domains/schemas/movie-genre.schema';
@@ -16,6 +19,7 @@ import { MoviesService } from './services/movie.service';
 
 @Module({
   imports: [
+    CacheModule.register(),
     TypeOrmModule.forFeature([MovieEntity], 'mongodbConnection'),
     TypeOrmModule.forFeature([GenreEntity], 'mongodbConnection'),
     TypeOrmModule.forFeature([MovieTrendingDayEntity], 'mongodbConnection'),
@@ -30,6 +34,8 @@ import { MoviesService } from './services/movie.service';
     MovieTrendingWeekRepository,
     MovieGenresRepository,
     MoviePopularRepository,
+    LlmRepository,
+    LLMSearchService,
   ],
   exports: [MoviesService],
 })

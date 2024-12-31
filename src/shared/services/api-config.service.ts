@@ -42,7 +42,7 @@ export class ApiConfigService {
     const value = this.getString(key);
     const duration = parse(value, format);
 
-    if (duration === undefined) {
+    if (duration) {
       throw new Error(`${key} environment variable is not a valid duration`);
     }
 
@@ -170,6 +170,14 @@ export class ApiConfigService {
   get appConfig() {
     return {
       port: this.getString('PORT'),
+    };
+  }
+
+  get geminiConfig() {
+    return {
+      apiKey: this.getString('GEMINI_API_KEY'),
+      retrieverUrl: this.getString('GEMINI_RETRIEVER_URL'),
+      movieCollection: 'movies',
     };
   }
 
