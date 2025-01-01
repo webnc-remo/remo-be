@@ -4,9 +4,9 @@ import { Cache } from 'cache-manager';
 
 import { PageMetaDto } from '../../../common/page-meta.dto';
 import { PageOptionsDto } from '../../../common/page-options.dto';
+import { MoviesRepository } from '../../../modules/movie/repository/movie.repository';
 import { LlmRepository } from '../repository/llm.repository';
 
-// src/llm-search/llm-search.service.ts
 @Injectable()
 export class LLMSearchService {
   public logger: Logger;
@@ -14,6 +14,7 @@ export class LLMSearchService {
   constructor(
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly llmRepository: LlmRepository,
+    private readonly movieRepository: MoviesRepository,
   ) {
     this.logger = new Logger(LLMSearchService.name);
   }
@@ -23,7 +24,7 @@ export class LLMSearchService {
   }
 
   async search(pageOptionsDto: PageOptionsDto) {
-    const { q, skip, take } = pageOptionsDto;
+    const { q, skip, take, rating, genre, year } = pageOptionsDto;
 
     if (q === undefined) {
       throw new Error('Query cannot empty');
@@ -37,15 +38,40 @@ export class LLMSearchService {
       await this.cacheManager.set(cacheKey, allResults, 3_600_000); // 1 hour cache
     }
 
-    const paginatedResults = allResults.slice(skip, skip + take);
+    const movies = await this.movieRepository.findByObjectIds(allResults);
+
+    let filteredMovies = [...movies.items];
+
+    if (genre && genre.length > 0) {
+      filteredMovies = filteredMovies.filter((_movie) =>
+        _movie.genres.some((g) =>
+          g.name.toLowerCase().includes(genre.toLowerCase()),
+        ),
+      );
+    }
+
+    if (year && year.length > 0) {
+      filteredMovies = filteredMovies.filter(
+        (_movie) => _movie.release_date >= `${year}-01-01`,
+      );
+    }
+
+    if (rating) {
+      const floatRating = Number.parseFloat(rating) / 10;
+      filteredMovies = filteredMovies.filter(
+        (_movie) => _movie.vote_average >= floatRating,
+      );
+    }
+
+    const paginatedResults = filteredMovies.slice(skip, skip + take);
     const pageMetaDto = new PageMetaDto({
       pageOptionsDto,
-      itemCount: allResults.length,
+      itemCount: filteredMovies.length,
     });
 
     return {
-      movieIDs: paginatedResults,
-      pageMetaDto,
+      items: paginatedResults,
+      meta: pageMetaDto,
     };
   }
 }

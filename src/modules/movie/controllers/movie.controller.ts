@@ -42,14 +42,9 @@ export class MoviesController {
     const { isLLM } = pageOptionsDto;
 
     if (isLLM && isLLM.length > 0) {
-      const { movieIDs, pageMetaDto } =
-        await this.llmService.search(pageOptionsDto);
-      const movies = await this.moviesService.getMoviesByObjectIds(movieIDs);
+      const movies = await this.llmService.search(pageOptionsDto);
 
-      return {
-        items: movies.items,
-        meta: pageMetaDto,
-      };
+      return movies;
     }
 
     const movies = await this.moviesService.search(pageOptionsDto);
