@@ -70,6 +70,25 @@ export class MoviesController {
     return { results: movies };
   }
 
+  @Get('/similar/:id')
+  @PublicRoute(true)
+  @ApiOperation({ summary: 'Get similar movies' })
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: HttpStatus.ACCEPTED,
+    description: 'Similar movies retrieved successfully',
+  })
+  @ApiNotFoundResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Similar movies not found',
+  })
+  async getSimilarMovies(@Param('id') id: string) {
+    const numberId = Number.parseInt(id, 10);
+    const movies = await this.moviesService.getSimilarMovies(numberId);
+
+    return { results: movies };
+  }
+
   @Get('/popular')
   @PublicRoute(true)
   @ApiOperation({ summary: 'Get popular movies' })

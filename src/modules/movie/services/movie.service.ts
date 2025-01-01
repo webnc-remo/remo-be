@@ -6,6 +6,7 @@ import { MovieTrendingDayEntity } from '../domains/schemas/movie-trending-day.sc
 import { MoviesRepository } from '../repository/movie.repository';
 import { MovieGenresRepository } from '../repository/movie-genres.repository';
 import { MoviePopularRepository } from '../repository/movie-popular.repository';
+import { MovieSimilarRepository } from '../repository/movie-similar.repository';
 import { MovieTrendingDayRepository } from '../repository/movie-trending-day.repository';
 import { MovieTrendingWeekRepository } from '../repository/movie-trending-week.repository';
 
@@ -19,6 +20,7 @@ export class MoviesService {
     private readonly movieTrendingWeekRepository: MovieTrendingWeekRepository,
     private readonly movieGenresRepository: MovieGenresRepository,
     private readonly moviePopularRepository: MoviePopularRepository,
+    private readonly movieSimilarRepository: MovieSimilarRepository,
   ) {
     this.logger = new Logger(MoviesService.name);
   }
@@ -145,6 +147,16 @@ export class MoviesService {
 
       movie.item.vote_average = voteAverage;
       await this.moviesRepository.updateMovie(movie.item);
+    }
+  }
+
+  async getSimilarMovies(id: number) {
+    try {
+      const items = await this.movieSimilarRepository.getByTmdbID(id);
+
+      return items;
+    } catch (error) {
+      throw handleError(this.logger, error);
     }
   }
 }
