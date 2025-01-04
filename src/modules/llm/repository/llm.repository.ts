@@ -7,7 +7,7 @@ import { ApiConfigService } from '../../../shared/services/api-config.service';
 
 @Injectable()
 export class LlmRepository {
-  private readonly maxResults = 500;
+  private readonly maxResults = 100;
 
   constructor(private readonly configService: ApiConfigService) {}
 
