@@ -120,6 +120,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
         createdAt: favoriteList.createdAt,
         user: {
           fullname: userInfo.fullName as string,
+          email: userInfo.email as string,
         },
       },
       meta: movies.meta,
@@ -153,6 +154,7 @@ export class UserFavMoviesService implements IUserFavMoviesService {
         createdAt: list?.createdAt as Date,
         user: {
           fullname: list?.user.fullName as string,
+          email: list?.user.email as string,
         },
       };
 

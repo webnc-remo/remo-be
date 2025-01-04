@@ -116,6 +116,7 @@ export class PlaylistService {
         createdAt: playlist.createdAt,
         user: {
           fullname: userInfo.fullName as string,
+          email: userInfo.email as string,
         },
       },
       meta: movies.meta,

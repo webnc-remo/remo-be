@@ -118,6 +118,7 @@ export class UserWatchlistService implements IUserWatchlistService {
         createdAt: watchlist.createdAt,
         user: {
           fullname: userInfo.fullName as string,
+          email: userInfo.email as string,
         },
       },
       meta: movies.meta,
