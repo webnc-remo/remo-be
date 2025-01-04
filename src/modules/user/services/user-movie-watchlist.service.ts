@@ -151,6 +151,7 @@ export class UserWatchlistService implements IUserWatchlistService {
         createdAt: list?.createdAt as Date,
         user: {
           fullname: list?.user.fullName as string,
+          email: list?.user.email as string,
         },
       };
 

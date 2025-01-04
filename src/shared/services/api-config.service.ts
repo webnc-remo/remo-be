@@ -42,7 +42,7 @@ export class ApiConfigService {
     const value = this.getString(key);
     const duration = parse(value, format);
 
-    if (duration) {
+    if (!duration) {
       throw new Error(`${key} environment variable is not a valid duration`);
     }
 

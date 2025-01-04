@@ -6,6 +6,9 @@ import { MovieEntity } from '../../../../movie/domains/schemas/movie.schema';
 export class ListUserInfoDto {
   @ApiProperty()
   fullname?: string;
+
+  @ApiProperty()
+  email?: string;
 }
 
 export class ListInfoDto {
