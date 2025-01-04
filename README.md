@@ -1,4 +1,3 @@
-
 # ReMo Backend
 
 ## Getting started
@@ -21,6 +20,7 @@ make bootstrap
 ```
 
 ### Development
+
 ```bash
 # 4. Run development server and open http://localhost:3000
 make up
@@ -71,4 +71,5 @@ This project includes a `docs` folder with more details on:
 1.  [Naming Cheatsheet](docs/naming-cheatsheet.md)
 
 ## References
+
 https://narhakobyan.github.io/awesome-nest-boilerplate/
