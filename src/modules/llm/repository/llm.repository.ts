@@ -39,15 +39,40 @@ export class LlmRepository {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         navigateResponse.data.status === 200 &&
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        navigateResponse.data.data.params.movie_ids.length > 0
+        navigateResponse.data.data.route === 'CAST_PAGE'
       ) {
-        const tmdbId = await this.movieRepository.findTmdbIdByObjectId(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-          navigateResponse.data.data.params.movie_ids[0],
-        );
+        if (navigateResponse.data.data.params.movie_ids.length > 0) {
+          const tmdbId = await this.movieRepository.findTmdbIdByObjectId(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+            navigateResponse.data.data.params.movie_ids[0],
+          );
 
-        if (tmdbId !== undefined) {
-          return tmdbId;
+          if (tmdbId !== undefined) {
+            return tmdbId;
+          }
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const regexPattern =
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            navigateResponse.data.data.metadata['credits.cast.name'].$regex;
+
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const regexOptions =
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            navigateResponse.data.data.metadata['credits.cast.name'].$options ||
+            '';
+
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const movieIds = await this.movieRepository.findMoviesByRegex(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            regexPattern,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            regexOptions,
+          );
+
+          if (movieIds.length > 0) {
+            return movieIds[0];
+          }
         }
       }
 
