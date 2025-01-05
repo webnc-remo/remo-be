@@ -8,6 +8,7 @@ import {
 import { handleError } from '../../../common/utils';
 import { RegisterRequestDto } from '../..//auth/domains/dtos/requests/register.dto';
 import { GoogleAccount } from '../../auth/domains/dtos/requests/google.dto';
+import { UpdateProfileDto } from '../domains/dtos/requests/update-profile.dto';
 import { ProfileResponseDto } from '../domains/dtos/responses/profile.dto';
 import { UserInfoDto } from '../domains/dtos/user-info.dto';
 import { UserEntity } from '../domains/entities/user.entity';
@@ -23,6 +24,10 @@ export interface IUserService {
   verifyUser(userId: string): Promise<void>;
   updateUserPassword(userId: string, password: string): Promise<void>;
   getUserById(userId: string): Promise<UserEntity | null>;
+  updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<ProfileResponseDto>;
 }
 
 @Injectable()
@@ -111,6 +116,34 @@ export class UserService implements IUserService {
       const user = await this.userRepository.findUserById(userId);
 
       return user;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
+
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<ProfileResponseDto> {
+    try {
+      const user = await this.userRepository.findUserById(userId);
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      // Update user
+      const updatedUser = await this.userRepository.updateUser(
+        userId,
+        updateProfileDto,
+      );
+
+      return {
+        id: updatedUser.id,
+        email: updatedUser.email ?? '',
+        avatar: updatedUser.avatar ?? '',
+        createdAt: updatedUser.createdAt,
+      };
     } catch (error) {
       throw handleError(this.logger, error);
     }

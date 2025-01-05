@@ -32,9 +32,7 @@ export class AuthRepository implements IAuthRepository {
     decodedToken: DecodedTokenDto,
   ): Promise<RefreshTokenEntity | null> {
     return this.tokenRepository.save({
-      user: {
-        id: userId,
-      },
+      userId,
       token: refreshToken,
       iat: new Date(decodedToken.iat * 1000),
       exp: new Date(decodedToken.exp * 1000),

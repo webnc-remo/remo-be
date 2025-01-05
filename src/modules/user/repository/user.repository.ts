@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { GoogleAccount } from '../../auth/domains/dtos/requests/google.dto';
+import { UpdateProfileDto } from '../domains/dtos/requests/update-profile.dto';
 import { UserRequestDto } from '../domains/dtos/requests/user.dto';
 import { UserEntity } from '../domains/entities/user.entity';
 
@@ -13,6 +14,7 @@ export interface IUserRepository {
     googleAccount: GoogleAccount,
   ): Promise<UserEntity | null>;
   verifyUser(userId: string): Promise<void>;
+  updateUser(userId: string, updateData: UpdateProfileDto): Promise<UserEntity>;
 }
 
 @Injectable()
@@ -57,5 +59,23 @@ export class UserRepository implements IUserRepository {
 
   async updatePassword(userId: string, password: string): Promise<void> {
     await this.userRepository.update(userId, { password });
+  }
+
+  async updateUser(
+    userId: string,
+    updateData: UpdateProfileDto,
+  ): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update fullName only
+    user.fullName = updateData.fullName;
+
+    return this.userRepository.save(user);
   }
 }
