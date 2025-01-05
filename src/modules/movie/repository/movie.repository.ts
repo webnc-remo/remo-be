@@ -165,4 +165,37 @@ export class MoviesRepository {
   async updateMovie(movie: MovieEntity) {
     return this.movieRepository.save(movie);
   }
+
+  async getNowPlayingMovie() {
+    const size = 8;
+
+    return this.movieRepository.find({
+      where: {
+        $and: [
+          { trailers: { $exists: true, $ne: undefined } },
+          { trailers: { $elemMatch: { official: true } } },
+        ],
+      },
+      select: [
+        'tmdb_id',
+        'title',
+        'original_title',
+        'poster_path',
+        'release_date',
+        'vote_average',
+        'vote_count',
+        'overview',
+        'popularity',
+        'adult',
+        'backdrop_path',
+        'original_language',
+        'video',
+        'tagline',
+        'genres',
+        'trailers',
+      ],
+      order: { release_date: -1 },
+      take: size,
+    });
+  }
 }

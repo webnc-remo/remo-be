@@ -134,6 +134,23 @@ class Credits {
   crew!: CreditCrew[];
 }
 
+class Trailers {
+  @Column()
+  name!: string;
+
+  @Column()
+  key!: string;
+
+  @Column()
+  site!: string;
+
+  @Column()
+  offical!: boolean;
+
+  @Column('date')
+  published_at!: string;
+}
+
 @Entity('movies')
 export class MovieEntity {
   @ObjectIdColumn() id?: ObjectId;
@@ -221,4 +238,7 @@ export class MovieEntity {
 
   @Column(() => Credits)
   credits!: Credits;
+
+  @Column()
+  trailers!: Trailers[];
 }

@@ -159,4 +159,14 @@ export class MoviesService {
       throw handleError(this.logger, error);
     }
   }
+
+  async getNowPlayingMovies() {
+    try {
+      const movies = await this.moviesRepository.getNowPlayingMovie();
+
+      return movies;
+    } catch (error) {
+      throw handleError(this.logger, error);
+    }
+  }
 }
