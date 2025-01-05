@@ -178,6 +178,7 @@ export class ApiConfigService {
       apiKey: this.getString('GEMINI_API_KEY'),
       retrieverUrl: this.getString('GEMINI_RETRIEVER_URL'),
       movieCollection: 'movies',
+      navigateUrl: this.getString('GEMINI_NAVIGATE_URL'),
     };
   }
 

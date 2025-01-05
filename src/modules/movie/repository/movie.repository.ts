@@ -149,6 +149,17 @@ export class MoviesRepository {
     };
   }
 
+  async findTmdbIdByObjectId(id: string) {
+    const objectId = new ObjectId(id);
+
+    const movie = await this.movieRepository.findOne({
+      where: { _id: objectId },
+      select: ['tmdb_id'],
+    });
+
+    return movie?.tmdb_id;
+  }
+
   async getMovieById(id: number) {
     const item = await this.movieRepository.findOne({
       where: {

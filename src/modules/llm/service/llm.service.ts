@@ -31,11 +31,17 @@ export class LLMSearchService {
     }
 
     const cacheKey = this.generateCacheKey(q);
-    let allResults = (await this.cacheManager.get<string[]>(cacheKey)) || null;
+
+    let allResults =
+      (await this.cacheManager.get<string[] | number>(cacheKey)) || null;
 
     if (!allResults) {
       allResults = await this.llmRepository.search(pageOptionsDto);
       await this.cacheManager.set(cacheKey, allResults, 3_600_000); // 1 hour cache
+    }
+
+    if (typeof allResults === 'number') {
+      return allResults;
     }
 
     const movies = await this.movieRepository.findByObjectIds(allResults);
