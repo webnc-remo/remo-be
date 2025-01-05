@@ -79,6 +79,7 @@ export class UserService implements IUserService {
         id: user.id,
         email: user.email ?? '',
         avatar: user.avatar ?? '',
+        fullName: user.fullName ?? '',
         createdAt: user.createdAt,
       };
 
@@ -142,6 +143,7 @@ export class UserService implements IUserService {
         id: updatedUser.id,
         email: updatedUser.email ?? '',
         avatar: updatedUser.avatar ?? '',
+        fullName: updatedUser.fullName ?? '',
         createdAt: updatedUser.createdAt,
       };
     } catch (error) {

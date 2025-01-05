@@ -11,5 +11,8 @@ export class ProfileResponseDto {
   avatar!: string;
 
   @ApiProperty()
+  fullName!: string;
+
+  @ApiProperty()
   createdAt!: Date;
 }
