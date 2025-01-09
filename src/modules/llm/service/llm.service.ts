@@ -33,9 +33,9 @@ export class LLMSearchService {
     const cacheKey = this.generateCacheKey(q);
 
     let allResults =
-      (await this.cacheManager.get<string[] | number>(cacheKey)) || null;
+      (await this.cacheManager.get<string[] | number>(cacheKey)) || undefined;
 
-    if (!allResults) {
+    if (allResults === undefined) {
       allResults = await this.llmRepository.search(pageOptionsDto);
       await this.cacheManager.set(cacheKey, allResults, 3_600_000); // 1 hour cache
     }
@@ -44,7 +44,9 @@ export class LLMSearchService {
       return allResults;
     }
 
-    const movies = await this.movieRepository.findByObjectIds(allResults);
+    const movies = await this.movieRepository.findByObjectIds(
+      allResults as string[],
+    );
 
     let filteredMovies = [...movies.items];
 

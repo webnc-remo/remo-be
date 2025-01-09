@@ -1,4 +1,4 @@
-import { BadGatewayException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 
 import {
@@ -18,15 +18,50 @@ export class LlmRepository {
     private readonly movieRepository: MoviesRepository,
   ) {}
 
-  async search(pageOptionsDto: PageOptionsDto): Promise<string[] | number> {
+  async search(
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<string[] | number | undefined> {
     const { q } = pageOptionsDto;
-    const { apiKey, retrieverUrl, navigateUrl } =
-      this.configService.geminiConfig;
+    const { apiKey, retrieverUrl } = this.configService.geminiConfig;
+
+    if (q === undefined) {
+      throw new Error('Query cannot empty');
+    }
+
+    const navigateResult = await this.handleNavigate(q);
+
+    if (navigateResult !== undefined) {
+      return navigateResult;
+    }
+
+    try {
+      const retrieverResponse = await axios.get<IGeminiApiResponse>(
+        retrieverUrl,
+        {
+          params: {
+            llm_api_key: apiKey,
+            collection_name: 'movies',
+            query: q,
+            amount: this.maxResults,
+          },
+        },
+      );
+
+      if (retrieverResponse.data.status === 200) {
+        return retrieverResponse.data.data.result;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async handleNavigate(q: string): Promise<number | undefined> {
+    const { apiKey, navigateUrl } = this.configService.geminiConfig;
 
     try {
       const navigateResponse = await axios.post<INavigateResponse>(
-        `${navigateUrl}?llm_api_key=${apiKey}&query=${encodeURIComponent(q ?? '')}`,
-        '', // empty body
+        `${navigateUrl}?llm_api_key=${apiKey}&query=${encodeURIComponent(q)}`,
+        '',
         {
           headers: {
             accept: 'application/json',
@@ -34,16 +69,12 @@ export class LlmRepository {
         },
       );
 
-      // If navigate returns valid movie_ids, use them
       if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         navigateResponse.data.status === 200 &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         navigateResponse.data.data.route === 'CAST_PAGE'
       ) {
         if (navigateResponse.data.data.params.movie_ids.length > 0) {
           const tmdbId = await this.movieRepository.findTmdbIdByObjectId(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
             navigateResponse.data.data.params.movie_ids[0],
           );
 
@@ -62,7 +93,6 @@ export class LlmRepository {
             navigateResponse.data.data.metadata['credits.cast.name'].$options ||
             '';
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const movieIds = await this.movieRepository.findMoviesByRegex(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             regexPattern,
@@ -75,30 +105,8 @@ export class LlmRepository {
           }
         }
       }
-
-      // Otherwise, fallback to retriever API
-      // eslint-disable-next-line max-len
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      const retrieverResponse = await axios.get<IGeminiApiResponse>(
-        retrieverUrl,
-        {
-          params: {
-            gemini_api_key: apiKey,
-            query: q,
-            amount: this.maxResults,
-          },
-        },
-      );
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      if (retrieverResponse.data.status === 200) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-        return retrieverResponse.data.data.result;
-      }
-
-      throw new BadGatewayException('Failed to retrieve similar movies');
     } catch {
-      throw new BadGatewayException('Failed to retrieve similar movies');
+      return undefined;
     }
   }
 }
