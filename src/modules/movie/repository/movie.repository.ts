@@ -213,13 +213,10 @@ export class MoviesRepository {
   async findMoviesByRegex(pattern: string, options: string): Promise<number[]> {
     const movies = await this.movieRepository.find({
       where: {
-        credits: {
-          cast: {
-            some: {
-              name: { $regex: pattern, $options: options },
-            },
-          },
-        },
+        $or: [
+          { title: { $regex: pattern, $options: options } },
+          { original_title: { $regex: pattern, $options: options } },
+        ],
       },
       select: ['tmdb_id'],
     });
