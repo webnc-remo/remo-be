@@ -211,7 +211,7 @@ export class MoviesRepository {
   }
 
   async findMoviesByRegex(pattern: string, options: string): Promise<number[]> {
-    const movies = await this.movieRepository.find({
+    let movies = await this.movieRepository.find({
       where: {
         $or: [
           { title: { $regex: pattern, $options: options } },
@@ -220,6 +220,36 @@ export class MoviesRepository {
       },
       select: ['tmdb_id'],
     });
+
+    // Nếu không tìm thấy kết quả nào, thử tìm kiếm mở rộng
+    if (movies.length === 0) {
+      // Tạo pattern mới bằng cách tách các từ và tìm kiếm linh hoạt hơn
+      const words = pattern.split(' ').filter((word) => word.length > 2);
+
+      if (words.length > 0) {
+        const flexiblePattern = words.map((word) => `(?=.*${word})`).join('');
+        movies = await this.movieRepository.find({
+          where: {
+            $or: [
+              { title: { $regex: flexiblePattern, $options: options } },
+              {
+                original_title: { $regex: flexiblePattern, $options: options },
+              },
+            ],
+          },
+          select: ['tmdb_id'],
+          limit: 5,
+        });
+      }
+
+      if (movies.length === 0) {
+        movies = await this.movieRepository.find({
+          select: ['tmdb_id'],
+          limit: 3,
+          sort: { popularity: -1 },
+        });
+      }
+    }
 
     return movies.map((movie) => movie.tmdb_id);
   }

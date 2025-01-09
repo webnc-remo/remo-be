@@ -62,11 +62,6 @@ export class LlmRepository {
       const navigateResponse = await axios.post<INavigateResponse>(
         `${navigateUrl}?llm_api_key=${apiKey}&query=${encodeURIComponent(q)}`,
         '',
-        {
-          headers: {
-            accept: 'application/json',
-          },
-        },
       );
 
       if (
